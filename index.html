@@ -1,0 +1,1765 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#EE5A24">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Hausaufgaben">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="icon-192.png">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<title>Hausaufgaben V&amp;M</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,800&family=Figtree:wght@400;500;600;700&display=swap">
+<style>
+/* Layout: App-Shell — Verlaufsleiste oben, Seitennavigation am Desktop, Tab-Leiste am Handy; der Monatskalender ist die Startfläche */
+:root{
+  --a:#EE5A24;            /* Akzent 1 (Orange) */
+  --b:#D62839;            /* Akzent 2 (Rot) */
+  --pV:#8C4FE3;           /* V: Lila */
+  --pM:#7DC31A;           /* M: Limettengrün */
+  --surface:#FFFFFF;
+  --bg:color-mix(in oklab, var(--a) 5%, #FFFFFF);
+  --ink:#221613;
+  --ink-2:color-mix(in oklab, var(--ink) 72%, var(--surface));
+  --muted:color-mix(in oklab, var(--ink) 52%, var(--surface));
+  --line:color-mix(in oklab, var(--a) 14%, #E7E2DF);
+  --tint:color-mix(in oklab, var(--a) 8%, var(--surface));
+  --tint-2:color-mix(in oklab, var(--a) 16%, var(--surface));
+  --a-text:color-mix(in oklab, var(--a) 82%, #000);
+  --late:#C9242F; --soon:#C46A00; --ok:#2E8B57;
+  --scrim:rgb(25 12 6 / .45);
+  --shadow:0 1px 2px rgb(40 20 10 / .06), 0 10px 30px -14px rgb(40 20 10 / .25);
+  --f-display:"Bricolage Grotesque","Segoe UI",system-ui,sans-serif;
+  --f-body:"Figtree","Segoe UI",system-ui,-apple-system,sans-serif;
+  --r:14px; --r-sm:10px;
+}
+:root[data-palette="ozean"]{--a:#0B7FC1;--b:#0E9A9A}
+:root[data-palette="wald"]{--a:#2F8F4E;--b:#6E8F12}
+:root[data-palette="beere"]{--a:#C2185B;--b:#7B3FB5}
+:root[data-palette="sonne"]{--a:#DB8600;--b:#E2551B}
+:root[data-palette="graphit"]{--a:#4F5D6B;--b:#1F2933}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    color-scheme:dark;
+    --surface:#1E1816;
+    --bg:color-mix(in oklab, var(--a) 6%, #110D0C);
+    --ink:#F6ECE7;
+    --line:color-mix(in oklab, var(--a) 16%, #3A302C);
+    --tint:color-mix(in oklab, var(--a) 12%, var(--surface));
+    --tint-2:color-mix(in oklab, var(--a) 24%, var(--surface));
+    --a-text:color-mix(in oklab, var(--a) 70%, #fff);
+    --late:#FF6B6B; --soon:#FFB347; --ok:#5BD08A;
+    --scrim:rgb(0 0 0 / .6);
+    --shadow:0 1px 2px rgb(0 0 0 / .3), 0 10px 30px -12px rgb(0 0 0 / .7);
+  }
+}
+:root[data-theme="dark"]{
+  color-scheme:dark;
+  --surface:#1E1816;
+  --bg:color-mix(in oklab, var(--a) 6%, #110D0C);
+  --ink:#F6ECE7;
+  --line:color-mix(in oklab, var(--a) 16%, #3A302C);
+  --tint:color-mix(in oklab, var(--a) 12%, var(--surface));
+  --tint-2:color-mix(in oklab, var(--a) 24%, var(--surface));
+  --a-text:color-mix(in oklab, var(--a) 70%, #fff);
+  --late:#FF6B6B; --soon:#FFB347; --ok:#5BD08A;
+  --scrim:rgb(0 0 0 / .6);
+  --shadow:0 1px 2px rgb(0 0 0 / .3), 0 10px 30px -12px rgb(0 0 0 / .7);
+}
+
+*{box-sizing:border-box}
+:root{color-scheme:light; padding-top:env(safe-area-inset-top,0px); padding-bottom:env(safe-area-inset-bottom,0px)}
+body{margin:0}
+img{max-width:100%}
+[hidden]{display:none !important}
+html,body{height:100%}
+body{background:var(--bg); color:var(--ink); font:400 15px/1.5 var(--f-body); -webkit-font-smoothing:antialiased}
+body.modal-open{overflow:hidden}
+button{font:inherit; color:inherit; cursor:pointer}
+button:disabled{cursor:default}
+:focus-visible{outline:2px solid var(--a); outline-offset:2px}
+h1,h2,h3{font-family:var(--f-display); text-wrap:balance; margin:0; letter-spacing:-.01em}
+h1{font-size:clamp(26px,4.2vw,38px); font-weight:800; line-height:1.05}
+h2{font-size:20px; font-weight:800}
+h3{font-size:13px; font-family:var(--f-body); font-weight:700; text-transform:uppercase; letter-spacing:.09em; color:var(--muted)}
+p{margin:0}
+.ic{flex:none; display:block}
+.eyebrow{font:700 12px/1.2 var(--f-body); text-transform:uppercase; letter-spacing:.1em; color:var(--a-text); margin-bottom:6px}
+.num{font-variant-numeric:tabular-nums}
+
+/* Avatare */
+.av{--pc:var(--pV); display:inline-grid; place-items:center; width:32px; height:32px; border-radius:50%; background:var(--pc); color:#fff; font:800 15px/1 var(--f-display); text-shadow:0 1px 1px rgb(0 0 0 / .28); flex:none; user-select:none}
+.av-M{--pc:var(--pM)}
+.av.sm{width:22px; height:22px; font-size:11px}
+.av.lg{width:76px; height:76px; font-size:36px}
+
+/* Kopfleiste */
+.topbar{position:sticky; top:env(safe-area-inset-top,0px); z-index:30; display:flex; align-items:center; justify-content:space-between; gap:12px; padding:10px 16px; background:linear-gradient(100deg,var(--a),var(--b)); color:#fff}
+.brand{display:flex; align-items:center; gap:10px; min-width:0}
+.duo{display:flex}
+.duo .av{box-shadow:0 0 0 2px #fff}
+.duo .av + .av{margin-left:-8px}
+.brand-name{font:800 20px/1 var(--f-display); letter-spacing:-.01em; white-space:nowrap}
+.top-actions{display:flex; align-items:center; gap:8px}
+.sync{display:inline-flex; align-items:center; gap:6px; font:600 12px var(--f-body); padding:4px 10px; border-radius:999px; background:rgb(255 255 255 / .16); white-space:nowrap}
+.sync::before{content:""; width:7px; height:7px; border-radius:50%; background:#fff; opacity:.6}
+.sync.live::before{background:#7CF0A6; opacity:1}
+.sync.local::before{background:#FFD166; opacity:1}
+.help-btn{position:relative; display:grid; place-items:center; width:40px; height:40px; border-radius:12px; border:0; background:rgb(255 255 255 / .18); color:#fff}
+.help-btn:hover{background:rgb(255 255 255 / .28)}
+.help-btn.mine{background:#fff; color:var(--b)}
+.help-btn.alert{background:#fff; color:var(--b); animation:ring 1.1s ease-in-out infinite}
+.help-btn .dot{position:absolute; top:-3px; right:-3px}
+.me-btn{border:0; background:none; padding:0; border-radius:50%}
+.me-btn .av{box-shadow:0 0 0 2px #fff}
+.me-btn .av.none{background:rgb(255 255 255 / .25)}
+@keyframes ring{0%,100%{transform:rotate(0)}20%{transform:rotate(-12deg)}40%{transform:rotate(10deg)}60%{transform:rotate(-6deg)}80%{transform:rotate(4deg)}}
+@media (max-width:520px){ .sync span{display:none} .sync{padding:6px} .brand-name{font-size:18px} }
+
+/* Gerüst */
+.shell{display:grid; grid-template-columns:1fr; min-height:calc(100% - 60px)}
+.sidenav{display:none}
+.content{min-width:0; width:100%; max-width:1240px; margin-inline:auto; padding-inline:16px; padding-block:18px 140px}
+@media (min-width:900px){
+  .shell{grid-template-columns:232px minmax(0,1fr)}
+  .sidenav{display:flex; flex-direction:column; gap:4px; padding:18px 12px; border-right:1px solid var(--line); background:var(--surface); position:sticky; top:calc(60px + env(safe-area-inset-top,0px)); height:calc(100vh - 60px); align-self:start}
+  .content{padding-inline:28px; padding-block:26px 80px}
+  .tabbar{display:none !important}
+}
+.navbtn{display:flex; align-items:center; gap:12px; padding:10px 12px; border:0; border-radius:10px; background:none; font-weight:600; color:var(--ink-2); text-align:left}
+.navbtn:hover{background:var(--tint)}
+.navbtn[aria-current="page"]{background:var(--tint-2); color:var(--a-text)}
+.navbtn .lbl{flex:1}
+.badge{display:inline-grid; place-items:center; min-width:20px; height:20px; padding:0 6px; border-radius:999px; background:var(--b); color:#fff; font:700 11px/1 var(--f-body); font-variant-numeric:tabular-nums}
+.side-foot{margin-top:auto; padding:12px; font-size:12px; color:var(--muted)}
+
+.tabbar{position:fixed; left:0; right:0; bottom:0; z-index:30; display:grid; grid-template-columns:repeat(4,1fr); background:var(--surface); border-top:1px solid var(--line); padding:6px 6px calc(6px + env(safe-area-inset-bottom,0px))}
+.tabbtn{position:relative; display:flex; flex-direction:column; align-items:center; gap:2px; padding:6px 2px; border:0; background:none; font:600 11px var(--f-body); color:var(--muted); border-radius:10px}
+.tabbtn[aria-current="page"]{color:var(--a-text)}
+.tabbtn[aria-current="page"] .ic{transform:translateY(-1px)}
+.tabbtn .badge{position:absolute; top:0; left:calc(50% + 6px); height:17px; min-width:17px; font-size:10px; padding:0 4px}
+
+.fab{position:fixed; right:16px; bottom:calc(78px + env(safe-area-inset-bottom,0px)); z-index:31; display:flex; align-items:center; gap:8px; height:54px; padding:0 20px 0 16px; border:0; border-radius:18px; background:linear-gradient(120deg,var(--a),var(--b)); color:#fff; font:700 15px var(--f-body); box-shadow:0 10px 24px -8px color-mix(in oklab, var(--b) 70%, transparent)}
+.fab:hover{filter:brightness(1.05)}
+@media (min-width:900px){ .fab{bottom:24px; right:28px} }
+
+/* Hilfe-Banner */
+#banner{display:grid; gap:10px}
+#banner:not(:empty){margin-bottom:18px}
+.help-banner{display:flex; align-items:center; gap:12px; flex-wrap:wrap; padding:12px 14px; border-radius:var(--r); background:linear-gradient(100deg,var(--b),var(--a)); color:#fff; box-shadow:var(--shadow)}
+.help-banner.mine{background:var(--surface); color:var(--ink); border:1px dashed color-mix(in oklab, var(--b) 50%, var(--line)); box-shadow:none}
+.help-ico{display:grid; place-items:center; width:44px; height:44px; border-radius:12px; background:#fff; color:var(--b); flex:none; animation:ring 1.4s ease-in-out infinite}
+.help-banner.mine .help-ico{background:var(--tint-2); color:var(--b); animation:none}
+.hb-text{flex:1 1 220px; min-width:0; display:grid; gap:2px}
+.hb-text b{font:800 17px/1.2 var(--f-display)}
+.hb-text span{font-size:14px; opacity:.92; overflow-wrap:anywhere}
+.hb-actions{display:flex; gap:8px; flex-wrap:wrap}
+
+/* Knöpfe */
+.btn{display:inline-flex; align-items:center; justify-content:center; gap:7px; height:40px; padding:0 16px; border-radius:11px; border:1px solid transparent; font:600 14px var(--f-body); background:var(--tint-2); color:var(--ink); white-space:nowrap}
+.btn:hover{filter:brightness(.97)}
+.btn.primary{background:var(--a); color:#fff}
+.btn.primary:hover{filter:brightness(1.06)}
+.btn.ghost{background:transparent; border-color:var(--line)}
+.btn.ghost:hover{background:var(--tint)}
+.btn.sm{height:34px; padding:0 12px; font-size:13px; border-radius:9px}
+.btn.light{background:#fff; color:var(--b); border-color:#fff}
+.btn.onacc{background:rgb(255 255 255 / .16); color:#fff; border-color:rgb(255 255 255 / .5)}
+.btn.danger{color:var(--late)}
+.btn[data-armed]{background:var(--late); color:#fff; border-color:var(--late)}
+.btn:disabled{opacity:.55}
+.iconbtn{display:grid; place-items:center; width:36px; height:36px; border-radius:10px; border:1px solid var(--line); background:var(--surface); color:var(--ink-2)}
+.iconbtn:hover{background:var(--tint)}
+
+/* Segment-Schalter */
+.seg{display:inline-flex; flex-wrap:wrap; background:var(--tint); border-radius:11px; padding:3px; gap:2px}
+.seg button{display:inline-flex; align-items:center; gap:6px; border:0; background:transparent; padding:6px 12px; border-radius:8px; font:600 13px var(--f-body); color:var(--ink-2)}
+.seg button[aria-pressed="true"]{background:var(--surface); color:var(--a-text); box-shadow:0 1px 3px rgb(0 0 0 / .1)}
+.toggle{display:inline-flex; align-items:center; gap:6px; height:34px; padding:0 12px; border-radius:999px; border:1px solid var(--line); background:var(--surface); font:600 13px var(--f-body); color:var(--ink-2)}
+.toggle[aria-pressed="true"]{background:var(--a); border-color:var(--a); color:#fff}
+
+/* Seitenkopf */
+.page-head,.month-head{display:flex; align-items:flex-end; justify-content:space-between; gap:14px; flex-wrap:wrap; margin-bottom:18px}
+.month-nav{display:flex; align-items:center; gap:6px}
+.toolbar{display:flex; flex-wrap:wrap; align-items:center; gap:10px 18px; margin-bottom:20px; padding:12px; background:var(--surface); border:1px solid var(--line); border-radius:var(--r)}
+.tool{display:flex; align-items:center; gap:8px; flex-wrap:wrap}
+.tool-label{font:700 11px var(--f-body); text-transform:uppercase; letter-spacing:.09em; color:var(--muted)}
+.select{height:34px; padding:0 30px 0 10px; border-radius:9px; border:1px solid var(--line); background:var(--surface); color:var(--ink); font:600 13px var(--f-body)}
+
+/* Monatsfakten */
+.month-facts{display:flex; flex-wrap:wrap; gap:0; margin:0 0 20px; background:var(--surface); border:1px solid var(--line); border-radius:var(--r); overflow:hidden}
+.month-facts > div{flex:1 1 130px; padding:12px 16px; border-right:1px solid var(--line); margin:0}
+.month-facts > div:last-child{border-right:0}
+.month-facts dt{font:600 12px var(--f-body); color:var(--muted)}
+.month-facts dd{margin:2px 0 0; font:800 28px/1.1 var(--f-display); font-variant-numeric:tabular-nums}
+.month-facts .next{flex:2 1 230px; background:var(--tint)}
+.month-facts .next dd{font:700 15px/1.35 var(--f-body); display:flex; flex-wrap:wrap; gap:6px; align-items:center; margin-top:6px}
+@media (max-width:560px){ .month-facts > div{flex-basis:45%; border-bottom:1px solid var(--line)} }
+
+/* Erinnerungen */
+.reminders{margin-bottom:22px}
+.rem-head{display:flex; align-items:center; gap:8px; margin-bottom:10px; color:var(--a-text)}
+.rem-head h3{color:inherit}
+.rem-row{display:flex; gap:10px; overflow-x:auto; padding-bottom:6px; scroll-snap-type:x proximity}
+.rem-row .card{flex:0 0 min(290px,84%); scroll-snap-align:start}
+
+/* Kalender */
+.cal-bar{display:flex; justify-content:space-between; align-items:center; gap:10px; flex-wrap:wrap; margin-bottom:12px}
+.cal-layout{display:grid; gap:18px}
+@media (min-width:1120px){ .cal-layout{grid-template-columns:minmax(0,1fr) 330px; align-items:start} }
+.cal{display:grid; grid-template-columns:repeat(7,minmax(0,1fr)); gap:1px; background:var(--line); border:1px solid var(--line); border-radius:var(--r); overflow:hidden}
+.cal-dow{background:var(--tint); padding:8px 8px; font:700 11px var(--f-body); text-transform:uppercase; letter-spacing:.08em; color:var(--muted)}
+.day{display:flex; flex-direction:column; align-items:stretch; gap:3px; min-height:104px; padding:6px; border:0; background:var(--surface); text-align:left; min-width:0}
+.day:hover{background:var(--tint)}
+.day.out{background:color-mix(in oklab, var(--surface) 55%, var(--bg))}
+.day.out .dnum{color:var(--muted)}
+.day.weekend .dnum{color:var(--muted)}
+.dnum{display:inline-grid; place-items:center; align-self:flex-start; min-width:26px; height:26px; padding:0 4px; border-radius:999px; font:700 13px var(--f-body); font-variant-numeric:tabular-nums}
+.day.today .dnum{background:var(--a); color:#fff}
+.day.sel{box-shadow:inset 0 0 0 2px var(--a)}
+.dchip{display:block; min-width:0; padding:2px 6px; border-radius:6px; font:600 11.5px/1.3 var(--f-body); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; background:color-mix(in oklab, var(--c) 15%, var(--surface)); color:var(--ink)}
+.dchip.k-ka{background:var(--b); color:#fff}
+.dchip.k-test{background:var(--a); color:#fff}
+.dchip.k-pres{background:color-mix(in oklab, var(--b) 18%, var(--surface)); color:var(--ink); box-shadow:inset 0 0 0 1.5px var(--b)}
+.dchip.k-event{background:transparent; box-shadow:inset 0 0 0 1px var(--line); color:var(--ink-2)}
+.dchip.done{opacity:.45; text-decoration:line-through}
+.dmore{font:600 11px var(--f-body); color:var(--muted); padding-left:4px}
+@media (max-width:640px){
+  .day{min-height:62px; padding:4px; gap:2px}
+  .dnum{min-width:24px; height:24px; font-size:12px}
+  .dchip{font-size:0; height:5px; padding:0; border-radius:3px; background:var(--c)}
+  .dchip.k-ka,.dchip.k-test,.dchip.k-pres{height:7px}
+  .dchip.k-pres{background:var(--b)}
+  .dchip.k-event{background:var(--muted)}
+  .dmore{font-size:10px; padding:0}
+  .cal-dow{padding:6px 2px; text-align:center; letter-spacing:0}
+}
+.daypanel{background:var(--surface); border:1px solid var(--line); border-radius:var(--r); padding:16px; display:grid; gap:12px}
+.daypanel .cards{gap:8px}
+.add-day{justify-self:start}
+.empty-sm{color:var(--muted); font-size:14px}
+
+/* Karten */
+.groups{display:grid; gap:24px}
+.group-h{display:flex; align-items:center; gap:8px; margin-bottom:10px; font:700 13px var(--f-body); text-transform:uppercase; letter-spacing:.09em; color:var(--muted)}
+.group-h.late{color:var(--late)}
+.group-h .count{font-variant-numeric:tabular-nums; font-weight:600; opacity:.8}
+.cards{display:grid; gap:10px}
+@media (min-width:760px){ .groups .cards{grid-template-columns:repeat(auto-fill,minmax(330px,1fr))} }
+.card{display:flex; align-items:center; gap:12px; padding:13px 14px; background:var(--surface); border:1px solid var(--line); border-radius:var(--r); cursor:pointer; min-width:0}
+.card:hover{border-color:color-mix(in oklab, var(--a) 45%, var(--line))}
+.card-main{flex:1; min-width:0; display:grid; gap:4px}
+.card-top{display:flex; align-items:center; gap:6px; flex-wrap:wrap}
+.subj{display:inline-flex; align-items:center; gap:6px; font:700 12.5px var(--f-body); color:var(--ink-2)}
+.subj i{width:9px; height:9px; border-radius:3px; background:var(--c); flex:none}
+.star{color:var(--a-text); font-weight:700}
+.card-title{font:600 16px/1.3 var(--f-body); overflow-wrap:anywhere}
+.card.is-done .card-title{text-decoration:line-through; color:var(--muted)}
+.card-meta{display:flex; align-items:center; gap:8px; flex-wrap:wrap; font-size:13px; color:var(--muted)}
+.card-side{flex:none; display:flex; align-items:center}
+.att{display:inline-flex; align-items:center; gap:3px}
+.att.new{color:var(--b); font-weight:700}
+.only{font:700 11px var(--f-body); padding:1px 7px; border-radius:999px; background:var(--tint); color:var(--ink-2)}
+.pill{display:inline-flex; align-items:center; font:700 12px/1.5 var(--f-body); padding:1px 8px; border-radius:999px; background:var(--tint); color:var(--ink-2); white-space:nowrap}
+.u-late{background:color-mix(in oklab, var(--late) 15%, var(--surface)); color:var(--late)}
+.u-soon{background:color-mix(in oklab, var(--soon) 16%, var(--surface)); color:var(--soon)}
+.u-done{background:color-mix(in oklab, var(--ok) 14%, var(--surface)); color:var(--ok)}
+.kb{display:inline-flex; font:800 10.5px/1.6 var(--f-body); letter-spacing:.06em; text-transform:uppercase; padding:0 7px; border-radius:6px; white-space:nowrap}
+.kb-ka{background:var(--b); color:#fff}
+.kb-test{background:var(--a); color:#fff}
+.kb-pres{box-shadow:inset 0 0 0 1.5px var(--b); color:var(--ink)}
+.kb-event{box-shadow:inset 0 0 0 1px var(--line); color:var(--ink-2)}
+.kb-hw{background:var(--tint-2); color:var(--ink-2)}
+.count-box{display:grid; justify-items:center; min-width:56px; padding:6px 8px; border-radius:12px; background:var(--tint)}
+.count-box b{font:800 24px/1 var(--f-display); font-variant-numeric:tabular-nums}
+.count-box span{font:600 11px var(--f-body); color:var(--muted)}
+.count-box.hot{background:color-mix(in oklab, var(--late) 14%, var(--surface)); color:var(--late)}
+.count-box.hot span{color:inherit}
+
+/* Häkchen pro Person */
+.ticks{display:flex; gap:6px}
+.tick{--pc:var(--pV); display:grid; place-items:center; width:34px; height:34px; border-radius:50%; border:2px solid var(--pc); background:transparent; color:var(--pc); font:800 15px var(--f-display); padding:0; transition:background-color .25s, color .25s}
+.tick.p-M{--pc:var(--pM)}
+.tick.on{background:var(--pc); color:#fff; text-shadow:0 1px 1px rgb(0 0 0 / .28)}
+.tick:not(:disabled):hover{transform:scale(1.07)}
+.tick:disabled:not(.on){opacity:.5}
+.tick[data-action="nudge"]{box-shadow:0 0 0 3px color-mix(in oklab, var(--pc) 32%, transparent)}
+.ticks.big{flex-wrap:wrap}
+.ticks.big .tick{width:auto; height:42px; border-radius:999px; padding:0 14px 0 5px; gap:8px; display:inline-flex; border:1px solid var(--line); background:var(--surface); color:var(--ink); font:600 14px var(--f-body); text-shadow:none}
+.ticks.big .tick .tk{display:grid; place-items:center; width:30px; height:30px; border-radius:50%; border:2px solid var(--pc); color:var(--pc); font:800 14px var(--f-display); transition:background-color .25s, color .25s}
+.ticks.big .tick.on{background:color-mix(in oklab, var(--pc) 14%, var(--surface)); border-color:transparent}
+.ticks.big .tick.on .tk{background:var(--pc); color:#fff; text-shadow:0 1px 1px rgb(0 0 0 / .28)}
+.ticks.big .tick[data-action="nudge"]{box-shadow:none}
+.av.xs{width:18px; height:18px; font-size:10px}
+.by{display:inline-flex; align-items:center; gap:5px; margin-left:auto; font:600 12px var(--f-body); color:var(--muted); white-space:nowrap}
+.odone{font-weight:700; color:color-mix(in oklab, var(--pc) 70%, var(--ink))}
+.nudge{display:grid; gap:10px; margin-top:10px; padding:12px; border-radius:var(--r-sm); border:1px dashed var(--line)}
+
+/* Leere Zustände */
+.empty{display:grid; justify-items:start; gap:10px; padding:28px; background:var(--surface); border:1px dashed var(--line); border-radius:var(--r)}
+.empty h2{font-size:22px}
+.empty p{color:var(--ink-2); max-width:52ch}
+.notice{padding:10px 14px; border-radius:var(--r-sm); background:var(--tint); color:var(--ink-2); font-size:14px; margin-bottom:16px}
+
+/* Modal / Bottom-Sheet */
+#modal-root{position:fixed; inset:0; z-index:50; display:grid; align-items:end; justify-items:center}
+.scrim{position:absolute; inset:0; background:var(--scrim)}
+.sheet{position:relative; width:min(640px,100%); max-height:92vh; max-height:92dvh; overflow:auto; background:var(--surface); color:var(--ink); border-radius:22px 22px 0 0; padding:22px 18px calc(22px + env(safe-area-inset-bottom,0px)); box-shadow:var(--shadow); animation:up .22s ease-out}
+@media (min-width:700px){ #modal-root{align-items:center; padding:20px} .sheet{border-radius:22px; padding:26px} }
+@keyframes up{from{transform:translateY(24px); opacity:.6}to{transform:none; opacity:1}}
+.sheet-x{position:absolute; top:14px; right:14px}
+.sheet h2{font-size:24px; padding-right:44px}
+.sheet .lead{color:var(--ink-2); margin-top:6px}
+.form{display:grid; gap:16px; margin-top:18px}
+.field{display:grid; gap:6px}
+.field > span,.field > legend{font:700 13px var(--f-body); color:var(--ink-2); padding:0}
+fieldset.field{border:0; margin:0; padding:0; min-width:0}
+.input{width:100%; min-height:44px; padding:10px 12px; border-radius:11px; border:1px solid var(--line); background:var(--bg); color:var(--ink); font:400 16px var(--f-body)}
+textarea.input{resize:vertical; min-height:84px; line-height:1.45}
+.input:focus{outline:2px solid var(--a); outline-offset:0; border-color:transparent}
+.row2{display:grid; gap:16px; grid-template-columns:1fr 1fr}
+@media (max-width:480px){ .row2{grid-template-columns:1fr} }
+.chips{display:flex; flex-wrap:wrap; gap:6px}
+.chip-r{position:relative}
+.chip-r input{position:absolute; opacity:0; pointer-events:none}
+.chip-r span{display:inline-flex; align-items:center; gap:6px; height:36px; padding:0 13px; border-radius:999px; border:1px solid var(--line); font:600 14px var(--f-body); color:var(--ink-2); cursor:pointer; background:var(--surface)}
+.chip-r input:checked + span{background:var(--a); border-color:var(--a); color:#fff}
+.chip-r input:focus-visible + span{outline:2px solid var(--a); outline-offset:2px}
+.err{color:var(--late); font-size:13px; font-weight:600}
+.form-foot{display:flex; justify-content:flex-end; gap:10px; flex-wrap:wrap}
+
+/* Detail */
+.dt-top{display:flex; align-items:center; gap:8px; flex-wrap:wrap; margin-bottom:8px; padding-right:44px}
+.dt-title{font-size:26px; overflow-wrap:anywhere}
+.dt-due{display:flex; align-items:center; gap:8px; flex-wrap:wrap; margin-top:8px; color:var(--ink-2)}
+.dt-done{display:flex; align-items:center; gap:12px; flex-wrap:wrap; margin-top:16px; padding:12px; border-radius:var(--r-sm); background:var(--tint)}
+.dt-done > span{font-weight:700}
+.dt-desc{margin-top:14px; white-space:pre-wrap; overflow-wrap:anywhere; max-width:65ch}
+.dt-actions{display:flex; gap:8px; flex-wrap:wrap; margin-top:16px}
+.dt-by{margin-top:10px; font-size:12.5px; color:var(--muted)}
+.dt-sec{margin-top:22px; padding-top:18px; border-top:1px solid var(--line); display:grid; gap:12px}
+.topics{list-style:none; margin:0; padding:0; display:grid; gap:6px}
+.topics li{display:flex; align-items:center; gap:10px; padding:8px 8px 8px 12px; border-radius:10px; background:var(--tint)}
+.topics li span{flex:1; overflow-wrap:anywhere}
+.topics .iconbtn{width:30px; height:30px; background:transparent; border-color:transparent}
+.inline-form{display:flex; gap:8px}
+.inline-form .input{min-height:40px; padding:8px 12px}
+.notes{display:grid; gap:12px}
+.note{display:flex; gap:10px; align-items:flex-start}
+.note-body{flex:1; min-width:0; padding:10px 12px; border-radius:4px 14px 14px 14px; background:var(--tint)}
+.note.mine .note-body{background:var(--tint-2)}
+.note-meta{display:flex; align-items:center; gap:8px; font-size:12.5px; color:var(--muted)}
+.note-meta b{color:var(--ink)}
+.note-meta .iconbtn{width:26px; height:26px; margin-left:auto; border-color:transparent; background:transparent}
+.iconbtn[data-armed]{background:var(--late) !important; color:#fff !important}
+.note-text{margin-top:4px; white-space:pre-wrap; overflow-wrap:anywhere}
+.note-files{display:flex; flex-wrap:wrap; gap:8px; margin-top:8px}
+.thumb{padding:0; border:0; border-radius:10px; overflow:hidden; width:120px; height:96px; background:var(--surface)}
+.thumb img{width:100%; height:100%; object-fit:cover; display:block}
+.filechip{display:inline-flex; align-items:center; gap:6px; max-width:100%; padding:8px 12px; border-radius:10px; background:var(--surface); border:1px solid var(--line); color:var(--ink); text-decoration:none; font:600 13px var(--f-body)}
+.filechip span{overflow:hidden; text-overflow:ellipsis; white-space:nowrap}
+.composer{display:grid; gap:8px; padding:10px; border:1px solid var(--line); border-radius:var(--r); background:var(--bg)}
+.composer textarea{border:0; background:transparent; min-height:56px; padding:4px 6px; outline:none}
+.composer textarea:focus{outline:none}
+.composer-row{display:flex; align-items:center; gap:8px; flex-wrap:wrap}
+.composer-row .hint{flex:1; font-size:12.5px; color:var(--muted); min-width:120px}
+.pending{display:flex; flex-wrap:wrap; gap:6px}
+.pending:empty{display:none}
+.pchip{display:inline-flex; align-items:center; gap:6px; max-width:100%; padding:4px 4px 4px 10px; border-radius:999px; background:var(--tint-2); font:600 12.5px var(--f-body)}
+.pchip span{overflow:hidden; text-overflow:ellipsis; white-space:nowrap; max-width:180px}
+.pchip button{display:grid; place-items:center; width:22px; height:22px; border:0; border-radius:50%; background:var(--surface)}
+
+/* Wer bist du */
+.who-pick{display:grid; grid-template-columns:1fr 1fr; gap:12px; margin-top:18px}
+.who-card{display:grid; justify-items:center; gap:10px; padding:20px 10px; border-radius:var(--r); border:2px solid var(--line); background:var(--surface); font:700 15px var(--f-body)}
+.who-card:hover{border-color:var(--a)}
+.who-card[aria-pressed="true"]{border-color:var(--a); background:var(--tint)}
+.reasons{display:flex; flex-wrap:wrap; gap:6px}
+
+/* Einstellungen */
+.settings{display:grid; gap:18px; max-width:860px}
+.set-card{background:var(--surface); border:1px solid var(--line); border-radius:var(--r); padding:18px; display:grid; gap:14px}
+.set-card > p{color:var(--ink-2); font-size:14px; max-width:62ch}
+.palettes{display:grid; grid-template-columns:repeat(auto-fill,minmax(150px,1fr)); gap:10px}
+.pal{display:grid; gap:8px; padding:10px; border-radius:12px; border:2px solid var(--line); background:var(--surface); text-align:left; font:600 13.5px var(--f-body)}
+.pal[aria-pressed="true"]{border-color:var(--ink)}
+.pal i{display:block; height:34px; border-radius:8px}
+.pal small{display:block; font-weight:500; color:var(--muted)}
+.set-row{display:flex; align-items:center; justify-content:space-between; gap:12px; flex-wrap:wrap; padding:10px 0; border-top:1px solid var(--line)}
+.set-row:first-of-type{border-top:0}
+.set-row label{font-weight:600}
+.set-row .sub{display:block; font-weight:400; font-size:13px; color:var(--muted)}
+.switch{width:44px; height:26px; accent-color:var(--a)}
+.subj-list{display:grid; gap:6px}
+.subj-row{display:grid; grid-template-columns:40px minmax(0,1fr) auto auto; gap:8px; align-items:center}
+.subj-row input[type=color]{width:40px; height:36px; padding:2px; border-radius:9px; border:1px solid var(--line); background:var(--surface)}
+.subj-row .input{min-height:36px; padding:6px 10px; font-size:15px}
+.mainbtn{height:36px; padding:0 10px; border-radius:9px; border:1px solid var(--line); background:var(--surface); font:600 12.5px var(--f-body); color:var(--muted); white-space:nowrap}
+.mainbtn[aria-pressed="true"]{background:var(--tint-2); color:var(--a-text); border-color:transparent}
+.names{display:grid; grid-template-columns:1fr 1fr; gap:12px}
+@media (max-width:480px){ .names{grid-template-columns:1fr} .subj-row{grid-template-columns:40px minmax(0,1fr) auto} .subj-row .del{grid-column:3} .subj-row .mainbtn{grid-column:2 / 3; justify-self:start} }
+.name-field{display:flex; align-items:center; gap:10px}
+
+/* Toasts + Lightbox */
+#toasts{position:fixed; left:50%; transform:translateX(-50%); top:calc(70px + env(safe-area-inset-top,0px)); z-index:80; display:grid; gap:8px; width:min(420px,calc(100% - 32px)); pointer-events:none}
+.toast{display:flex; align-items:center; gap:10px; padding:11px 14px; border-radius:12px; background:var(--ink); color:var(--surface); font:600 14px var(--f-body); box-shadow:var(--shadow); pointer-events:auto; animation:up .2s ease-out}
+.toast.err{background:var(--late); color:#fff}
+.toast.help{background:linear-gradient(100deg,var(--b),var(--a)); color:#fff}
+#lightbox{position:fixed; inset:0; z-index:90; background:rgb(0 0 0 / .86); display:grid; place-items:center; padding:20px}
+#lightbox img{max-width:100%; max-height:calc(100% - 70px); border-radius:8px; object-fit:contain}
+#lightbox .lb-bar{position:absolute; top:calc(12px + env(safe-area-inset-top,0px)); right:12px; display:flex; gap:8px}
+#lightbox .iconbtn{background:rgb(255 255 255 / .14); color:#fff; border-color:transparent; text-decoration:none}
+
+.skel{color:var(--muted)}
+body.locked .sidenav, body.locked .tabbar, body.locked .fab, body.locked .top-actions{display:none !important}
+body.locked .shell{grid-template-columns:1fr}
+.login{max-width:440px; margin:6vh auto 0; display:grid; gap:12px; padding:26px; background:var(--surface); border:1px solid var(--line); border-radius:22px; box-shadow:var(--shadow)}
+.login .lead{color:var(--ink-2)}
+.login .form{margin-top:4px}
+.login-duo{display:flex}
+.login-duo .av{box-shadow:0 0 0 3px var(--surface)}
+.login-duo .av + .av{margin-left:-14px}
+.topic{display:flex; align-items:center; gap:8px; flex-wrap:wrap; padding:10px 12px; border-radius:var(--r-sm); background:var(--tint)}
+.topic code{flex:1 1 200px; font:600 14px ui-monospace,Consolas,monospace; overflow-wrap:anywhere; color:var(--ink)}
+.steps{margin:0; padding-left:20px; display:grid; gap:6px; color:var(--ink-2); font-size:14px; max-width:65ch}
+.steps a{color:var(--a-text); font-weight:600}
+@media (prefers-reduced-motion: reduce){ *,*::before,*::after{animation:none !important; transition:none !important} }
+</style>
+</head>
+<body>
+<header class="topbar">
+  <div class="brand">
+    <span class="duo" aria-hidden="true"><span class="av av-V">V</span><span class="av av-M">M</span></span>
+    <span class="brand-name">Hausaufgaben</span>
+  </div>
+  <div class="top-actions">
+    <span id="sync" class="sync" role="status"><span>Verbinde …</span></span>
+    <button id="help-btn" class="help-btn" data-action="help" aria-label="Hilfe rufen" title="Hilfe rufen"></button>
+    <button id="me-btn" class="me-btn" data-action="nav" data-view="settings" aria-label="Einstellungen"></button>
+  </div>
+</header>
+<div class="shell">
+  <nav class="sidenav" id="sidenav" aria-label="Bereiche"></nav>
+  <div class="content">
+    <div id="banner" aria-live="polite"></div>
+    <main id="main"></main>
+  </div>
+</div>
+<nav class="tabbar" id="tabbar" aria-label="Bereiche"></nav>
+<button class="fab" id="fab" data-action="add"></button>
+<div id="modal-root" hidden></div>
+<div id="lightbox" hidden><div class="lb-bar"><a class="iconbtn" id="lb-open" href="#" target="_blank" rel="noopener" aria-label="In neuem Tab öffnen"></a><button class="iconbtn" data-action="lb-close" aria-label="Schließen"></button></div><img id="lb-img" alt=""></div>
+<div id="toasts" aria-live="polite"></div>
+
+<script src="config.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.min.js"></script>
+<script>
+(function(){
+'use strict';
+const CFG = window.APP_CONFIG || {};
+
+/* ---------- Grundlagen ---------- */
+const APP_TITLE = 'Hausaufgaben V&M';
+const $ = (s, r) => (r || document).querySelector(s);
+const esc = s => String(s == null ? '' : s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const sleep = ms => new Promise(r => setTimeout(r, ms));
+const LS = {
+  get(k, d){ try { const v = localStorage.getItem(k); return v == null ? d : JSON.parse(v); } catch(e){ return d; } },
+  set(k, v){ try { localStorage.setItem(k, JSON.stringify(v)); } catch(e){} }
+};
+const SS = {
+  has(k){ try { return sessionStorage.getItem(k) === '1'; } catch(e){ return false; } },
+  add(k){ try { sessionStorage.setItem(k, '1'); } catch(e){} }
+};
+const col = c => /^#[0-9a-f]{3,8}$/i.test(String(c || '')) ? c : '#8A8A8A';
+
+const P_ICONS = {
+  home:'<path d="M3 10.5 12 3l9 7.5V20a1 1 0 0 1-1 1h-5v-6h-6v6H4a1 1 0 0 1-1-1z"/>',
+  book:'<path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20V3H6.5A2.5 2.5 0 0 0 4 5.5z"/><path d="M4 19.5A2.5 2.5 0 0 0 6.5 22H20v-5"/><path d="M8 7.5h8M8 11h5"/>',
+  exam:'<rect x="5" y="4" width="14" height="17" rx="2"/><path d="M9 4V2.8h6V4"/><path d="m9 13 2 2 4-4.5"/>',
+  sliders:'<path d="M4 6h9M17 6h3M4 12h3M11 12h9M4 18h11M19 18h1"/><circle cx="15" cy="6" r="2"/><circle cx="9" cy="12" r="2"/><circle cx="17" cy="18" r="2"/>',
+  plus:'<path d="M12 5v14M5 12h14"/>',
+  cal:'<rect x="3" y="5" width="18" height="16" rx="2.5"/><path d="M3 10h18M8 3v4M16 3v4"/>',
+  list:'<path d="M9 6h11M9 12h11M9 18h11"/><path d="M4.5 6h.01M4.5 12h.01M4.5 18h.01" stroke-width="3"/>',
+  clip:'<path d="M20.5 11.2 12.3 19.4a5 5 0 0 1-7.1-7.1l8.5-8.5a3.3 3.3 0 0 1 4.7 4.7l-8.5 8.5a1.7 1.7 0 0 1-2.4-2.4l7.8-7.8"/>',
+  check:'<path d="m5 12.5 4.5 4.5L19 7.5"/>',
+  trash:'<path d="M4 7h16M10 11v6M14 11v6M6 7l1 13h10l1-13M9 7V4h6v3"/>',
+  edit:'<path d="M4 20h4L19 9l-4-4L4 16z"/><path d="m13.5 6.5 4 4"/>',
+  x:'<path d="M6 6l12 12M18 6 6 18"/>',
+  chevL:'<path d="m15 6-6 6 6 6"/>',
+  chevR:'<path d="m9 6 6 6-6 6"/>',
+  file:'<path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8z"/><path d="M14 3v5h5"/>',
+  bell:'<path d="M6 16v-5a6 6 0 0 1 12 0v5l1.5 2h-15z"/><path d="M10 20.5a2 2 0 0 0 4 0"/>',
+  ext:'<path d="M14 4h6v6M20 4l-9 9M18 14v5a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V7a1 1 0 0 1 1-1h5"/>',
+  phoneQ:'<rect x="6" y="2" width="12" height="20" rx="2.6"/><path d="M10 9.3a2 2 0 1 1 2.7 1.9c-.5.2-.7.6-.7 1.1v.7"/><path d="M12 15.6h.01" stroke-width="2.6"/><path d="M10.5 19h3"/>'
+};
+const ic = (n, s) => `<svg class="ic" viewBox="0 0 24 24" width="${s || 20}" height="${s || 20}" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">${P_ICONS[n]}</svg>`;
+
+/* ---------- Daten-Konstanten ---------- */
+const KINDS = {
+  hw:{label:'Hausaufgabe', short:'HA'},
+  test:{label:'Test', short:'Test'},
+  ka:{label:'Klassenarbeit', short:'KA'},
+  pres:{label:'Präsentation', short:'Präs.'},
+  event:{label:'Termin', short:'Termin'}
+};
+const EXAM_KINDS = ['test','ka','pres'];
+const KIND_ORDER = {ka:0, test:1, pres:2, hw:3, event:4};
+const DEFAULT_SUBJECTS = [
+  {id:'de', name:'Deutsch', color:'#E4572E', main:true},
+  {id:'ma', name:'Mathe', color:'#2364AA', main:true},
+  {id:'en', name:'Englisch', color:'#C42847', main:true},
+  {id:'fr', name:'Französisch', color:'#3E8E7E', main:false},
+  {id:'la', name:'Latein', color:'#8D6A9F', main:false},
+  {id:'bio', name:'Biologie', color:'#4C9F38', main:false},
+  {id:'ch', name:'Chemie', color:'#17A398', main:false},
+  {id:'ph', name:'Physik', color:'#3A86FF', main:false},
+  {id:'ge', name:'Geschichte', color:'#9C6644', main:false},
+  {id:'ek', name:'Erdkunde', color:'#6A994E', main:false},
+  {id:'po', name:'Politik', color:'#BC4749', main:false},
+  {id:'inf', name:'Informatik', color:'#5E60CE', main:false},
+  {id:'ku', name:'Kunst', color:'#F4A259', main:false},
+  {id:'mu', name:'Musik', color:'#D1495B', main:false},
+  {id:'sp', name:'Sport', color:'#00A6A6', main:false},
+  {id:'re', name:'Religion/Ethik', color:'#A47E3B', main:false}
+];
+const PALETTES = [
+  {id:'glut', name:'Glut', sub:'Orange · Rot (Standard)', a:'#EE5A24', b:'#D62839'},
+  {id:'sonne', name:'Sonne', sub:'Gelb · Orange', a:'#DB8600', b:'#E2551B'},
+  {id:'beere', name:'Beere', sub:'Pink · Lila', a:'#C2185B', b:'#7B3FB5'},
+  {id:'ozean', name:'Ozean', sub:'Blau · Türkis', a:'#0B7FC1', b:'#0E9A9A'},
+  {id:'wald', name:'Wald', sub:'Grün · Oliv', a:'#2F8F4E', b:'#6E8F12'},
+  {id:'graphit', name:'Graphit', sub:'Grau · Schiefer', a:'#4F5D6B', b:'#1F2933'}
+];
+const HELP_REASONS = ['Ich verstehe die Aufgabe nicht','Ruf mich bitte an','Was haben wir auf?','Schick mir ein Foto','Sonstiges'];
+const SYNCED_PREFS = ['remindHw','remindEx','daily','notifyNew','notifyDone','notifyNotes'];
+const DEFAULT_PREFS = {me:null, palette:'glut', theme:'auto', remindHw:1, remindEx:3, sound:true, daily:true, notifyNew:true, notifyDone:true, notifyNotes:true,
+  hwSort:'urgency', hwFilter:'open', hwMode:'list', exSort:'urgency', exType:'all', exWhen:'upcoming', exMode:'list', homeFilter:'all', lastSubject:''};
+const HELP_TTL = 12 * 3600 * 1000;
+
+/* ---------- Zustand ---------- */
+const P = Object.assign({}, DEFAULT_PREFS, LS.get('vm-prefs', {}));
+const S = {
+  items: [], signals: {}, subjects: DEFAULT_SUBJECTS, people: {V:{name:''}, M:{name:''}},
+  view: ['home','hw','ex','settings'].includes(LS.get('vm-view','home')) ? LS.get('vm-view','home') : 'home',
+  month: null, selDay: null, loaded: false, prefsReady: false,
+  assets: null, sb: null, rprefs: {}, notifyPrefix: '', openId: null, notes: [], notesUnsub: null, pendingFiles: [],
+  seen: LS.get('vm-seen', {}), helpSeen: LS.get('vm-help-seen', 0), ackSeen: LS.get('vm-ack-seen', 0),
+  ui: {subj:'', mainOnly:false}, deferred: false, afterPick: null, usage: null, today: null
+};
+
+/* ---------- Datum ---------- */
+const pad = n => String(n).padStart(2, '0');
+const keyOf = d => `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`;
+const parseKey = k => { const [y, m, d] = String(k).split('-').map(Number); return new Date(y, (m || 1) - 1, d || 1); };
+const todayKey = () => keyOf(new Date());
+const addDays = (k, n) => { const d = parseKey(k); d.setDate(d.getDate() + n); return keyOf(d); };
+const daysUntil = k => Math.round((parseKey(k) - parseKey(todayKey())) / 86400000);
+const monthKey = d => `${d.getFullYear()}-${pad(d.getMonth() + 1)}`;
+const fmt = (k, o) => k ? new Intl.DateTimeFormat('de-DE', o).format(parseKey(k)) : '';
+const fmtDate = k => fmt(k, {weekday:'short', day:'numeric', month:'short'});
+const fmtLong = k => fmt(k, {weekday:'long', day:'numeric', month:'long'});
+const fmtShort = k => fmt(k, {day:'numeric', month:'numeric'}) + '.';
+const monthName = d => new Intl.DateTimeFormat('de-DE', {month:'long', year:'numeric'}).format(d);
+function relWord(k){
+  const d = daysUntil(k);
+  if (d === 0) return 'Heute'; if (d === 1) return 'Morgen'; if (d === -1) return 'Gestern'; if (d === 2) return 'Übermorgen';
+  return d > 0 ? `In ${d} Tagen` : `Vor ${-d} Tagen`;
+}
+function ago(ts){
+  if (!ts) return '';
+  const m = Math.floor((Date.now() - ts) / 60000);
+  if (m < 1) return 'gerade eben';
+  if (m < 60) return `vor ${m} Min.`;
+  const h = Math.floor(m / 60);
+  if (h < 24) return `vor ${h} Std.`;
+  return new Intl.DateTimeFormat('de-DE', {day:'numeric', month:'short', hour:'2-digit', minute:'2-digit'}).format(new Date(ts));
+}
+S.today = todayKey();
+S.selDay = S.today;
+S.month = new Date(new Date().getFullYear(), new Date().getMonth(), 1);
+
+/* ---------- Helfer zu Einträgen ---------- */
+const subj = id => S.subjects.find(s => s.id === id) || (id ? {id, name:'Fach gelöscht', color:'#8A8A8A', main:false} : {id:'', name:'Allgemein', color:'#8A8A8A', main:false});
+const pn = p => (p === 'V' || p === 'M') ? ((S.people[p] && S.people[p].name) || p) : '';
+const other = p => p === 'V' ? 'M' : 'V';
+const isExam = i => EXAM_KINDS.includes(i.kind);
+function doneFor(i){ return (i.who === 'V' || i.who === 'M') ? [i.who] : ['V','M']; }
+function isDone(i){
+  if (i.kind !== 'hw') return false;
+  const d = i.done || {};
+  if (P.me && doneFor(i).includes(P.me)) return !!d[P.me];
+  return doneFor(i).every(p => d[p]);
+}
+const byDate = (a, b) => (a.due || '9999').localeCompare(b.due || '9999') || ((subj(b.subject).main ? 1 : 0) - (subj(a.subject).main ? 1 : 0)) || (KIND_ORDER[a.kind] - KIND_ORDER[b.kind]) || String(a.title).localeCompare(String(b.title), 'de');
+function forMe(i){ return !P.me || !i.who || i.who === 'both' || i.who === P.me; }
+function reminders(){
+  const out = [];
+  for (const i of S.items){
+    if (!i.due || i.kind === 'event' || !forMe(i)) continue;
+    const d = daysUntil(i.due);
+    if (i.kind === 'hw'){ if (!isDone(i) && d <= P.remindHw) out.push(i); }
+    else if (d >= 0 && d <= P.remindEx) out.push(i);
+  }
+  return out.sort(byDate);
+}
+function helpActive(sig){ return !!(sig && sig.active && Date.now() - (sig.ts || 0) < HELP_TTL); }
+
+/* ---------- Speicher (Live-Datenbank oder lokal) ---------- */
+function deepMerge(t, s){
+  const o = Object.assign({}, t);
+  for (const k in s){
+    const v = s[k];
+    if (v && typeof v === 'object' && !Array.isArray(v) && o[k] && typeof o[k] === 'object' && !Array.isArray(o[k])) o[k] = deepMerge(o[k], v);
+    else o[k] = v;
+  }
+  return o;
+}
+const parentOf = p => p.split('/').slice(0, -1).join('/');
+function dbErr(e){
+  const msg = String((e && (e.message || e.error_description)) || e || '');
+  if (e && (e.code === '42501' || /row-level security|permission|JWT/i.test(msg))) return {code:'invalid_argument', message: msg};
+  if (/fetch|network|timeout/i.test(msg)) return {code:'unavailable', message: msg};
+  return {code: (e && e.code) || 'unknown', message: msg};
+}
+/* Alle Dokumente liegen in einer Tabelle "docs" (path → data). Der Cache spiegelt sie, Realtime hält ihn aktuell. */
+const Store = {
+  mode: 'connecting', cache: new Map(), subs: [], loaded: false, channel: null, dropped: false,
+  list(coll){ const out = []; for (const [p, d] of this.cache) if (parentOf(p) === coll) out.push(Object.assign({id: p.split('/').pop()}, d)); return out; },
+  fire(coll){ this.subs.forEach(s => { if (coll === undefined || s.coll === coll) s.fire(); }); },
+  async loadAll(){
+    const rows = [];
+    for (let from = 0; ; from += 1000){
+      const {data, error} = await S.sb.from('docs').select('path,data').range(from, from + 999);
+      if (error) throw dbErr(error);
+      rows.push.apply(rows, data);
+      if (data.length < 1000) break;
+    }
+    this.cache = new Map(rows.map(r => [r.path, r.data || {}]));
+    this.loaded = true;
+    this.fire();
+  },
+  connect(){
+    if (this.channel) S.sb.removeChannel(this.channel);
+    this.channel = S.sb.channel('docs-live')
+      .on('postgres_changes', {event:'*', schema:'public', table:'docs'}, ev => {
+        if (ev.eventType === 'DELETE'){ const p = ev.old && ev.old.path; if (p && this.cache.delete(p)) this.fire(parentOf(p)); }
+        else if (ev.new && ev.new.path){ this.cache.set(ev.new.path, ev.new.data || {}); this.fire(parentOf(ev.new.path)); }
+      })
+      .subscribe(status => {
+        if (status === 'SUBSCRIBED'){
+          const was = this.dropped; this.dropped = false; this.mode = 'db'; renderChrome(); renderBanner();
+          if (was) this.loadAll().catch(() => {});
+        } else if (status === 'CHANNEL_ERROR' || status === 'TIMED_OUT' || status === 'CLOSED'){
+          this.dropped = true; this.mode = 'offline'; renderChrome(); renderBanner();
+        }
+      });
+  },
+  watchCollection(coll, cb){
+    const sub = {coll, fire: () => cb(this.list(coll))};
+    this.subs.push(sub);
+    if (this.loaded) setTimeout(sub.fire, 0);
+    return () => { this.subs = this.subs.filter(x => x !== sub); };
+  },
+  async getDoc(path){ return this.cache.get(path) || null; },
+  async getCollection(coll){ return this.list(coll); },
+  async set(path, data){
+    const prev = this.cache.get(path), coll = parentOf(path);
+    this.cache.set(path, JSON.parse(JSON.stringify(data))); this.fire(coll);
+    const {error} = await S.sb.from('docs').upsert({path, coll, data, updated_at: new Date().toISOString()});
+    if (error){ if (prev === undefined) this.cache.delete(path); else this.cache.set(path, prev); this.fire(coll); throw dbErr(error); }
+  },
+  async update(path, patch){
+    const prev = this.cache.get(path), coll = parentOf(path);
+    if (prev){ this.cache.set(path, deepMerge(prev, JSON.parse(JSON.stringify(patch)))); this.fire(coll); }
+    const {error} = await S.sb.rpc('merge_doc', {p_path: path, p_patch: patch});
+    if (error){ if (prev){ this.cache.set(path, prev); this.fire(coll); } throw dbErr(error); }
+  },
+  async del(path){
+    const prev = this.cache.get(path), coll = parentOf(path);
+    this.cache.delete(path); this.fire(coll);
+    const {error} = await S.sb.from('docs').delete().eq('path', path);
+    if (error){ if (prev !== undefined){ this.cache.set(path, prev); this.fire(coll); } throw dbErr(error); }
+  },
+  newId(){ return Date.now().toString(36) + Math.random().toString(36).slice(2, 8); }
+};
+/* Fotos und PDFs liegen im privaten Speicher-Bucket "files"; angezeigt werden sie über zeitlich begrenzte Links. */
+const Files = {
+  urls: {}, tried: {},
+  url(id){ const u = this.urls[id]; return u && u.exp > Date.now() ? u.url : ''; },
+  async ensure(ids){
+    const need = Array.from(new Set(ids)).filter(id => !this.url(id) && !this.tried[id]);
+    if (!need.length) return false;
+    need.forEach(id => this.tried[id] = true);
+    const {data, error} = await S.sb.storage.from('files').createSignedUrls(need, 6 * 3600);
+    if (error || !data) return false;
+    let got = false;
+    data.forEach(d => { const u = d.signedUrl || d.signedURL; if (u && d.path){ this.urls[d.path] = {url: u, exp: Date.now() + 5.5 * 3600 * 1000}; delete this.tried[d.path]; got = true; } });
+    return got;
+  },
+  async upload(blob, opts){
+    const type = (opts && opts.type) || blob.type || '';
+    const ext = {'image/jpeg':'jpg', 'image/png':'png', 'image/webp':'webp', 'image/gif':'gif', 'application/pdf':'pdf'}[type];
+    if (!ext) throw {code:'unsupported_type'};
+    if (blob.size > 20 * 1048576) throw {code:'too_large'};
+    const path = `${Store.newId()}-${Math.random().toString(36).slice(2, 10)}.${ext}`;
+    const {error} = await S.sb.storage.from('files').upload(path, blob, {contentType: type, upsert: false});
+    if (error){ const m = String(error.message || ''); throw {code: /size|large|413/i.test(m) ? 'too_large' : /mime|type/i.test(m) ? 'unsupported_type' : /quota/i.test(m) ? 'quota_or_state' : 'upstream_error'}; }
+    return {id: path, contentType: type, sizeBytes: blob.size};
+  },
+  async delete(id){ const {error} = await S.sb.storage.from('files').remove([id]); if (error) throw error; return {deleted: true}; }
+};
+const queues = {};
+function write(path, op, data){
+  if (!Store.loaded){ toast('Verbinde noch … Versuch es gleich nochmal.', 'err'); return Promise.reject({code:'connecting'}); }
+  const run = async () => {
+    for (let attempt = 0; attempt < 2; attempt++){
+      try {
+        if (op === 'set') return await Store.set(path, data);
+        if (op === 'update') return await Store.update(path, data);
+        return await Store.del(path);
+      } catch(e){
+        if (e && e.code === 'unavailable' && attempt === 0){ await sleep(400 + Math.random() * 700); continue; }
+        reportWriteError(e); throw e;
+      }
+    }
+  };
+  const p = (queues[path] || Promise.resolve()).catch(() => {}).then(run);
+  queues[path] = p;
+  return p;
+}
+function reportWriteError(e){
+  const c = e && e.code;
+  if (c === 'quota_exceeded') toast('Der Speicher ist voll. Lösche alte Einträge oder Dateien.', 'err');
+  else if (c === 'invalid_argument') toast('Speichern nicht erlaubt. Melde dich unter Einstellungen ab und wieder an.', 'err');
+  else if (c === 'resource_exhausted') toast('Gerade zu viele Änderungen auf einmal. Versuch es gleich nochmal.', 'err');
+  else toast('Konnte nicht speichern. Prüfe die Internetverbindung.', 'err');
+}
+
+/* ---------- Einstellungen ---------- */
+function applyPalette(){
+  const r = document.documentElement;
+  if (P.palette && P.palette !== 'glut') r.setAttribute('data-palette', P.palette); else r.removeAttribute('data-palette');
+}
+function setPref(k, v, opts){
+  P[k] = v;
+  LS.set('vm-prefs', P);
+  if (k === 'palette') applyPalette();
+  if (k === 'theme') applyTheme();
+  if (k === 'me') applyRemotePrefs();
+  if (SYNCED_PREFS.includes(k)) savePrefsRemote();
+  if (!opts || !opts.silent){ render(true); renderChrome(); }
+}
+function savePrefsRemote(){
+  if (!P.me || !Store.loaded) return;
+  const o = {}; SYNCED_PREFS.forEach(k => o[k] = P[k]);
+  write(`prefs/${P.me}`, 'set', o).catch(() => {});
+}
+/* Erinnerungs- und Nachrichten-Einstellungen gehören zur Person (V oder M), damit auch die tägliche Erinnerung sie kennt. */
+function applyRemotePrefs(){
+  if (!P.me || !Store.loaded) return;
+  const rp = S.rprefs[P.me];
+  if (!rp){ savePrefsRemote(); return; }
+  SYNCED_PREFS.forEach(k => { if (rp[k] !== undefined && rp[k] !== null) P[k] = rp[k]; });
+  LS.set('vm-prefs', P);
+}
+function applyTheme(){
+  const r = document.documentElement;
+  if (P.theme === 'light' || P.theme === 'dark') r.setAttribute('data-theme', P.theme); else r.removeAttribute('data-theme');
+}
+applyPalette(); applyTheme();
+
+/* ---------- Toasts, Ton, Mitteilungen ---------- */
+function toast(msg, kind){
+  const t = document.createElement('div');
+  t.className = 'toast' + (kind ? ' ' + kind : '');
+  t.textContent = msg;
+  $('#toasts').appendChild(t);
+  setTimeout(() => t.remove(), kind === 'err' ? 6000 : 4200);
+}
+function chime(){
+  try {
+    const C = window.AudioContext || window.webkitAudioContext; if (!C) return;
+    const ctx = S.actx || (S.actx = new C());
+    if (ctx.state === 'suspended') ctx.resume();
+    const t = ctx.currentTime;
+    [880, 1175, 1568].forEach((f, i) => {
+      const o = ctx.createOscillator(), g = ctx.createGain();
+      o.type = 'sine'; o.frequency.value = f;
+      const s = t + i * .16;
+      g.gain.setValueAtTime(.0001, s); g.gain.exponentialRampToValueAtTime(.22, s + .02); g.gain.exponentialRampToValueAtTime(.0001, s + .38);
+      o.connect(g); g.connect(ctx.destination); o.start(s); o.stop(s + .42);
+    });
+  } catch(e){}
+}
+/* Push-Nachrichten über ntfy.sh: jede Person hat einen eigenen geheimen Kanal (prefix-V, prefix-M). */
+const appUrl = () => location.origin + location.pathname;
+const topicFor = p => S.notifyPrefix ? `${S.notifyPrefix}-${p}` : '';
+function wants(p, key){ const rp = S.rprefs[p]; return !key || !rp || rp[key] !== false; }
+function notify(p, title, message, opts){
+  opts = opts || {};
+  const topic = topicFor(p);
+  if (!topic || !wants(p, opts.pref)) return Promise.resolve(false);
+  const body = {topic, title: String(title).slice(0, 200), message: String(message || ' ').slice(0, 1000), priority: opts.priority || 3, tags: opts.tags || [], click: appUrl() + (opts.itemId ? '#item=' + opts.itemId : '')};
+  return fetch('https://ntfy.sh/', {method:'POST', body: JSON.stringify(body)}).then(r => r.ok).catch(() => false);
+}
+function helpPush(type, reason, msg, itemId){
+  const it = itemId && S.items.find(i => i.id === itemId);
+  notify(other(P.me), `${pn(P.me)} ${type === 'together' ? 'möchte es zusammen machen' : 'braucht Hilfe'}`,
+    [reason, msg, it ? subj(it.subject).name + ': ' + it.title : ''].filter(Boolean).join(' · '),
+    {priority: 5, tags: [type === 'together' ? 'handshake' : 'sos'], itemId});
+}
+
+/* ---------- Bausteine ---------- */
+function av(p, cls){ return `<span class="av av-${p}${cls ? ' ' + cls : ''}" title="${esc(pn(p))}">${p}</span>`; }
+function kindBadge(k){ return `<span class="kb kb-${k}">${esc(KINDS[k] ? KINDS[k].label : k)}</span>`; }
+function duePill(i, d){
+  if (i.kind === 'hw' && isDone(i)) return '<span class="pill u-done">erledigt</span>';
+  let cls = '', t;
+  if (d < 0){ cls = 'u-late'; t = isExam(i) || i.kind === 'event' ? 'vorbei' : (d === -1 ? 'seit gestern überfällig' : `seit ${-d} Tagen überfällig`); if (isExam(i) || i.kind === 'event') cls = ''; }
+  else if (d === 0){ cls = 'u-late'; t = 'heute'; }
+  else if (d === 1){ cls = 'u-soon'; t = 'morgen'; }
+  else if (d <= 3){ cls = 'u-soon'; t = `in ${d} Tagen`; }
+  else t = `in ${d} Tagen`;
+  return `<span class="pill ${cls}">${t}</span>`;
+}
+function countdown(d){
+  if (d === 0) return '<div class="count-box hot"><b>!</b><span>heute</span></div>';
+  return `<div class="count-box ${d <= 2 ? 'hot' : ''}"><b>${d}</b><span>${d === 1 ? 'Tag' : 'Tage'}</span></div>`;
+}
+/* Ist die andere Person schon fertig, ich aber noch nicht? Dann ihr Buchstabe, sonst null. */
+function otherDoneFor(i){
+  if (!i || i.kind !== 'hw' || !P.me || !doneFor(i).includes(P.me)) return null;
+  const o = other(P.me), d = i.done || {};
+  return (doneFor(i).includes(o) && d[o] && !d[P.me]) ? o : null;
+}
+function doneBtns(i, big){
+  const d = i.done || {};
+  const od = otherDoneFor(i);
+  return `<div class="ticks${big ? ' big' : ''}">${doneFor(i).map(p => {
+    const on = !!d[p]; const mine = p === P.me;
+    let action = 'toggle-done', enabled = !P.me || mine, label;
+    if (mine || !P.me) label = on ? `${pn(p)} ist fertig (antippen zum Zurücknehmen)` : `${pn(p)}: als erledigt markieren`;
+    else label = on ? `${pn(p)} ist schon fertig` : `${pn(p)}: noch offen`;
+    if (od === p){ action = 'nudge'; enabled = true; label = `${pn(p)} ist schon fertig. Um Hilfe fragen oder zusammen machen?`; }
+    const text = mine ? (on ? 'Fertig' : 'Als erledigt markieren') : (on ? 'Schon fertig' : 'Noch offen');
+    const inner = big ? `<span class="tk">${p}</span><span>${esc(pn(p))}: ${text}</span>` : p;
+    return `<button class="tick p-${p}${on ? ' on' : ''}" data-action="${action}" data-id="${esc(i.id)}" data-p="${p}" ${enabled ? '' : 'disabled'} aria-pressed="${on}" title="${esc(label)}" aria-label="${esc(label)}">${inner}</button>`;
+  }).join('')}</div>`;
+}
+function cardHTML(i){
+  const s = subj(i.subject);
+  const d = i.due ? daysUntil(i.due) : null;
+  const done = isDone(i);
+  const unread = i.lastNoteAt && i.lastNoteBy !== P.me && i.lastNoteAt > (S.seen[i.id] || 0);
+  const od = otherDoneFor(i);
+  const by = (i.createdBy === 'V' || i.createdBy === 'M') ? `<span class="by" title="Eingetragen von ${esc(pn(i.createdBy))}">${av(i.createdBy, 'xs')}von ${esc(pn(i.createdBy))}</span>` : '';
+  let side = '';
+  if (i.kind === 'hw') side = doneBtns(i);
+  else if (isExam(i) && d !== null && d >= 0) side = countdown(d);
+  return `<div class="card${done ? ' is-done' : ''}" data-action="open" data-id="${esc(i.id)}" role="button" tabindex="0">
+    <div class="card-main">
+      <div class="card-top"><span class="subj" style="--c:${col(s.color)}"><i></i>${esc(s.name)}${s.main ? ' <b class="star" title="Hauptfach">★</b>' : ''}</span>${i.kind !== 'hw' ? kindBadge(i.kind) : ''}${(i.who === 'V' || i.who === 'M') ? `<span class="only">nur ${esc(pn(i.who))}</span>` : ''}${by}</div>
+      <div class="card-title">${esc(i.title)}</div>
+      <div class="card-meta">${d !== null ? duePill(i, d) : ''}<span class="num">${esc(fmtDate(i.due))}</span>${od ? `<span class="odone" style="--pc:var(--p${od})">${esc(pn(od))} ist schon fertig</span>` : ''}${i.hasNotes ? `<span class="att${unread ? ' new' : ''}">${ic('clip', 14)}${unread ? 'Neu' : ''}</span>` : ''}${isExam(i) && i.topics && i.topics.length ? `<span>${i.topics.length} ${i.topics.length === 1 ? 'Thema' : 'Themen'}</span>` : ''}</div>
+    </div>
+    ${side ? `<div class="card-side">${side}</div>` : ''}
+  </div>`;
+}
+function seg(k, opts){
+  return `<div class="seg" role="group">${opts.map(([v, l]) => `<button data-action="seg" data-k="${k}" data-v="${v}" aria-pressed="${P[k] === v}">${l}</button>`).join('')}</div>`;
+}
+function monthNav(){
+  return `<div class="month-nav">
+    <button class="iconbtn" data-action="month" data-d="-1" aria-label="Voriger Monat">${ic('chevL', 18)}</button>
+    <button class="btn ghost sm" data-action="month" data-d="0">Heute</button>
+    <button class="iconbtn" data-action="month" data-d="1" aria-label="Nächster Monat">${ic('chevR', 18)}</button>
+  </div>`;
+}
+function calendarHTML(items){
+  const m = S.month, y = m.getFullYear(), mo = m.getMonth();
+  const offset = (new Date(y, mo, 1).getDay() + 6) % 7;
+  const dim = new Date(y, mo + 1, 0).getDate();
+  const rows = Math.ceil((offset + dim) / 7);
+  const byDay = {};
+  items.forEach(i => { if (i.due) (byDay[i.due] = byDay[i.due] || []).push(i); });
+  const tk = todayKey();
+  let html = '<div class="cal">' + ['Mo','Di','Mi','Do','Fr','Sa','So'].map(d => `<div class="cal-dow">${d}</div>`).join('');
+  for (let n = 0; n < rows * 7; n++){
+    const date = new Date(y, mo, 1 - offset + n);
+    const k = keyOf(date);
+    const list = (byDay[k] || []).slice().sort((a, b) => KIND_ORDER[a.kind] - KIND_ORDER[b.kind]);
+    const cls = ['day'];
+    if (date.getMonth() !== mo) cls.push('out');
+    if (k === tk) cls.push('today');
+    if (k === S.selDay) cls.push('sel');
+    if (date.getDay() === 0 || date.getDay() === 6) cls.push('weekend');
+    const chips = list.slice(0, 3).map(i => {
+      const s = subj(i.subject);
+      const label = i.kind === 'hw' ? s.name : (i.kind === 'event' ? i.title : `${KINDS[i.kind].short} ${s.name}`);
+      return `<span class="dchip k-${i.kind}${isDone(i) ? ' done' : ''}" style="--c:${col(s.color)}">${esc(label)}</span>`;
+    }).join('');
+    const more = list.length > 3 ? `<span class="dmore">+${list.length - 3}</span>` : '';
+    html += `<button class="${cls.join(' ')}" data-action="day" data-day="${k}" aria-label="${esc(fmtLong(k))}, ${list.length} ${list.length === 1 ? 'Eintrag' : 'Einträge'}"><span class="dnum">${date.getDate()}</span>${chips}${more}</button>`;
+  }
+  return html + '</div>';
+}
+function dayPanel(items){
+  const k = S.selDay;
+  const list = items.filter(i => i.due === k).sort((a, b) => KIND_ORDER[a.kind] - KIND_ORDER[b.kind]);
+  let body;
+  if (!S.loaded) body = '<p class="empty-sm">Lade eure Einträge …</p>';
+  else if (list.length) body = `<div class="cards">${list.map(cardHTML).join('')}</div>`;
+  else if (!S.items.length) body = '<p class="empty-sm">Noch keine Einträge. Tippe auf „Neu“, um die erste Hausaufgabe oder Klassenarbeit einzutragen.</p>';
+  else body = '<p class="empty-sm">An diesem Tag ist nichts eingetragen.</p>';
+  return `<div><p class="eyebrow">${esc(relWord(k))}</p><h2>${esc(fmtLong(k))}</h2></div>${body}
+    <button class="btn ghost sm add-day" data-action="add" data-date="${k}">${ic('plus', 16)} Eintrag am ${esc(fmtShort(k))}</button>`;
+}
+function groupList(list, mode, ctx){
+  const sorted = list.slice().sort(byDate);
+  if (mode === 'subject'){
+    const order = S.subjects.map(s => s.id);
+    const map = {};
+    sorted.forEach(i => (map[i.subject || ''] = map[i.subject || ''] || []).push(i));
+    return Object.keys(map).sort((a, b) => { const ia = order.indexOf(a), ib = order.indexOf(b); return (ia < 0 ? 999 : ia) - (ib < 0 ? 999 : ib); })
+      .map(k => { const s = subj(k); return {label: esc(s.name) + (s.main ? ' <span class="star">★</span>' : ''), items: map[k]}; });
+  }
+  if (mode === 'main'){
+    return [{label:'Hauptfächer <span class="star">★</span>', items: sorted.filter(i => subj(i.subject).main)}, {label:'Nebenfächer', items: sorted.filter(i => !subj(i.subject).main)}].filter(g => g.items.length);
+  }
+  if (ctx === 'past') return [{label:'Vergangen', items: sorted.reverse()}];
+  const B = [
+    {key:'late', label: ctx === 'hw' ? 'Überfällig' : 'Vergangen', cls:'late', items:[]},
+    {key:'today', label:'Heute', items:[]},
+    {key:'tomorrow', label:'Morgen', items:[]},
+    {key:'week', label:'Nächste Tage', items:[]},
+    {key:'later', label:'Später', items:[]},
+    {key:'nodate', label:'Ohne Datum', items:[]}
+  ];
+  sorted.forEach(i => {
+    if (!i.due) return B[5].items.push(i);
+    const d = daysUntil(i.due);
+    B[d < 0 ? 0 : d === 0 ? 1 : d === 1 ? 2 : d <= 6 ? 3 : 4].items.push(i);
+  });
+  if (ctx === 'hw' && P.hwFilter !== 'open'){ B[0].label = 'Vergangen'; B[0].cls = ''; }
+  return B.filter(g => g.items.length);
+}
+function listHTML(groups, empty){
+  if (!S.loaded) return '<p class="skel">Lade eure Einträge …</p>';
+  if (!groups.length) return empty;
+  return `<div class="groups">${groups.map(g => `<section class="group"><h2 class="group-h ${g.cls || ''}">${g.label}<span class="count">${g.items.length}</span></h2><div class="cards">${g.items.map(cardHTML).join('')}</div></section>`).join('')}</div>`;
+}
+function emptyBox(title, text, kind){
+  return `<div class="empty"><h2>${title}</h2><p>${text}</p><button class="btn primary" data-action="add" data-kind="${kind}">${ic('plus', 18)} Neu eintragen</button></div>`;
+}
+function subjSelect(){
+  return `<select class="select" id="f-subj" aria-label="Fach filtern"><option value="">Alle Fächer</option>${S.subjects.map(s => `<option value="${esc(s.id)}"${S.ui.subj === s.id ? ' selected' : ''}>${esc(s.name)}</option>`).join('')}</select>`;
+}
+function filterCommon(list){
+  if (S.ui.subj) list = list.filter(i => i.subject === S.ui.subj);
+  if (S.ui.mainOnly) list = list.filter(i => subj(i.subject).main);
+  return list;
+}
+
+/* ---------- Ansichten ---------- */
+function viewHome(){
+  const mk = monthKey(S.month);
+  const mItems = S.items.filter(i => i.due && i.due.slice(0, 7) === mk);
+  const cnt = k => S.loaded ? mItems.filter(i => i.kind === k).length : '–';
+  const hwOpen = S.loaded ? mItems.filter(i => i.kind === 'hw' && !isDone(i)).length : '–';
+  const next = S.items.filter(i => isExam(i) && i.due && daysUntil(i.due) >= 0).sort(byDate)[0];
+  const rem = S.loaded ? reminders() : [];
+  const f = P.homeFilter;
+  const calItems = S.items.filter(i => f === 'all' ? true : f === 'hw' ? i.kind === 'hw' : i.kind !== 'hw');
+  const nextHTML = next ? `${kindBadge(next.kind)}<span>${esc(subj(next.subject).name)}: ${esc(next.title)}</span>${duePill(next, daysUntil(next.due))}` : '<span>Keine Tests oder Klassenarbeiten geplant</span>';
+  return `
+  <section class="month-head">
+    <div><p class="eyebrow">Monatsübersicht</p><h1>${esc(monthName(S.month))}</h1></div>
+    ${monthNav()}
+  </section>
+  <dl class="month-facts">
+    <div><dt>Hausaufgaben offen</dt><dd>${hwOpen}</dd></div>
+    <div><dt>Klassenarbeiten</dt><dd>${cnt('ka')}</dd></div>
+    <div><dt>Tests</dt><dd>${cnt('test')}</dd></div>
+    <div><dt>Präsentationen</dt><dd>${cnt('pres')}</dd></div>
+    <div class="next"><dt>Als Nächstes</dt><dd>${S.loaded ? nextHTML : '–'}</dd></div>
+  </dl>
+  ${rem.length ? `<section class="reminders"><div class="rem-head">${ic('bell', 18)}<h3>Bald fällig${P.me ? ' für ' + esc(pn(P.me)) : ''}</h3></div><div class="rem-row">${rem.map(cardHTML).join('')}</div></section>` : ''}
+  <section>
+    <div class="cal-bar">${seg('homeFilter', [['all','Alles'],['hw','Hausaufgaben'],['ex','Tests & Termine']])}</div>
+    <div class="cal-layout">
+      <div>${calendarHTML(calItems)}</div>
+      <aside class="daypanel">${dayPanel(calItems)}</aside>
+    </div>
+  </section>`;
+}
+function viewHw(){
+  const all = S.items.filter(i => i.kind === 'hw');
+  const open = all.filter(i => !isDone(i) && forMe(i)).length;
+  const head = `<section class="page-head"><div><p class="eyebrow">${S.loaded ? open + ' offen' : 'Hausaufgaben'}</p><h1>Hausaufgaben</h1></div>${seg('hwMode', [['list', ic('list', 16) + 'Liste'], ['cal', ic('cal', 16) + 'Kalender']])}</section>`;
+  const tools = `<div class="toolbar">
+    ${P.hwMode === 'list' ? `<div class="tool"><span class="tool-label">Sortieren</span>${seg('hwSort', [['urgency','Dringlichkeit'],['main','Hauptfächer zuerst'],['subject','Nach Fach']])}</div>
+    <div class="tool"><span class="tool-label">Zeigen</span>${seg('hwFilter', [['open','Offen'],['done','Erledigt'],['all','Alle']])}</div>` : ''}
+    <div class="tool">${subjSelect()}</div>
+    <button class="toggle" data-action="main-only" aria-pressed="${S.ui.mainOnly}">★ Nur Hauptfächer</button>
+  </div>`;
+  let base = filterCommon(all);
+  if (P.hwMode === 'cal'){
+    return head + tools + `<div class="cal-bar">${monthNav()}<h2>${esc(monthName(S.month))}</h2></div><div class="cal-layout"><div>${calendarHTML(base)}</div><aside class="daypanel">${dayPanel(base)}</aside></div>`;
+  }
+  if (P.hwFilter === 'open') base = base.filter(i => !isDone(i));
+  else if (P.hwFilter === 'done') base = base.filter(isDone);
+  const empty = !all.length
+    ? emptyBox('Noch keine Hausaufgaben', 'Trag ein, was aufgegeben wurde, mit Fach und Abgabedatum. Die Liste sortiert sich dann von selbst nach Dringlichkeit.', 'hw')
+    : (P.hwFilter === 'open' ? emptyBox('Alles erledigt', 'Gerade ist keine Hausaufgabe offen. Gut gemacht.', 'hw') : emptyBox('Nichts gefunden', 'Mit diesen Filtern gibt es keine Einträge.', 'hw'));
+  return head + tools + listHTML(groupList(base, P.hwSort, 'hw'), empty);
+}
+function viewEx(){
+  const all = S.items.filter(isExam);
+  const up = all.filter(i => i.due && daysUntil(i.due) >= 0).length;
+  const head = `<section class="page-head"><div><p class="eyebrow">${S.loaded ? up + ' anstehend' : 'Prüfungen'}</p><h1>Tests &amp; Präsentationen</h1></div>${seg('exMode', [['list', ic('list', 16) + 'Liste'], ['cal', ic('cal', 16) + 'Kalender']])}</section>`;
+  const tools = `<div class="toolbar">
+    <div class="tool"><span class="tool-label">Art</span>${seg('exType', [['all','Alle'],['ka','Klassenarbeit'],['test','Test'],['pres','Präsentation']])}</div>
+    ${P.exMode === 'list' ? `<div class="tool"><span class="tool-label">Zeit</span>${seg('exWhen', [['upcoming','Kommend'],['past','Vergangen']])}</div>
+    <div class="tool"><span class="tool-label">Sortieren</span>${seg('exSort', [['urgency','Datum'],['main','Hauptfächer zuerst'],['subject','Nach Fach']])}</div>` : ''}
+    <div class="tool">${subjSelect()}</div>
+    <button class="toggle" data-action="main-only" aria-pressed="${S.ui.mainOnly}">★ Nur Hauptfächer</button>
+  </div>`;
+  let base = filterCommon(all);
+  if (P.exType !== 'all') base = base.filter(i => i.kind === P.exType);
+  if (P.exMode === 'cal'){
+    const calItems = base.concat(S.items.filter(i => i.kind === 'event'));
+    return head + tools + `<div class="cal-bar">${monthNav()}<h2>${esc(monthName(S.month))}</h2></div><div class="cal-layout"><div>${calendarHTML(calItems)}</div><aside class="daypanel">${dayPanel(calItems)}</aside></div>`;
+  }
+  const past = P.exWhen === 'past';
+  base = base.filter(i => past ? (i.due && daysUntil(i.due) < 0) : (!i.due || daysUntil(i.due) >= 0));
+  const empty = !all.length
+    ? emptyBox('Noch keine Tests eingetragen', 'Trag Klassenarbeiten, Tests und Präsentationen mit Fach und Datum ein. Zu jedem Eintrag könnt ihr Themen, Fotos und PDFs sammeln.', 'test')
+    : emptyBox(past ? 'Nichts Vergangenes' : 'Nichts angekündigt', past ? 'Hier landen Tests, sobald ihr Datum vorbei ist.' : 'Gerade steht kein Test, keine Klassenarbeit und keine Präsentation an.', 'test');
+  return head + tools + listHTML(groupList(base, P.exSort, past ? 'past' : 'ex'), empty);
+}
+function viewSettings(){
+  const me = P.me, o = me ? other(me) : null, topic = me ? topicFor(me) : '';
+  const chk = (k, label, sub) => `<div class="set-row"><label for="p-${k}">${label}${sub ? `<span class="sub">${sub}</span>` : ''}</label><input type="checkbox" class="switch" id="p-${k}" data-pref="${k}"${P[k] ? ' checked' : ''}></div>`;
+  const push = !me ? '<p>Wähle oben zuerst aus, wer du bist.</p>' : !topic ? '<p>Der Benachrichtigungs-Kanal wird gerade angelegt …</p>' : `
+      <div class="topic"><span class="tool-label">Dein Kanal</span><code id="topic-name">${esc(topic)}</code><button class="btn ghost sm" data-action="copy-topic">Kopieren</button></div>
+      <ol class="steps">
+        <li><b>Handy:</b> App „ntfy“ aus dem Play Store oder App Store installieren. Auf <b>+</b> tippen, den Kanalnamen einfügen und abonnieren.</li>
+        <li><b>Laptop:</b> <a href="https://ntfy.sh/${esc(topic)}" target="_blank" rel="noopener">ntfy.sh/${esc(topic)}</a> öffnen, abonnieren und Benachrichtigungen im Browser erlauben.</li>
+        <li>Teste es mit dem Knopf unten. Den Kanalnamen nicht weitergeben, er ist euer Schlüssel.</li>
+      </ol>
+      <button class="btn primary sm" data-action="test-notify" style="justify-self:start">Test-Nachricht an mich senden</button>
+      <div>
+        <div class="set-row"><label>Hilfe-Rufe und „zusammen machen“<span class="sub">Kommen immer, mit hoher Priorität</span></label><span class="pill u-done">immer an</span></div>
+        ${chk('notifyNew', `Wenn ${esc(pn(o))} etwas Neues einträgt`)}
+        ${chk('notifyDone', `Wenn ${esc(pn(o))} eine Hausaufgabe fertig hat`)}
+        ${chk('notifyNotes', `Wenn ${esc(pn(o))} Notizen, Fotos oder PDFs schickt`)}
+      </div>`;
+  return `<section class="page-head"><div><p class="eyebrow">${me ? 'Für ' + esc(pn(me)) : 'Einstellungen'}</p><h1>Einstellungen</h1></div></section>
+  <div class="settings">
+    <section class="set-card">
+      <h2>Wer bist du?</h2>
+      <p>Gilt für dieses Gerät. Bestimmt, wessen Häkchen du setzt und wer die Nachrichten bekommt.</p>
+      <div class="who-pick" style="margin-top:0">
+        ${['V','M'].map(p => `<button class="who-card" data-action="pick-me" data-p="${p}" aria-pressed="${P.me === p}">${av(p, 'lg')}<span>Ich bin ${esc(pn(p))}</span></button>`).join('')}
+      </div>
+      <div class="names">
+        ${['V','M'].map(p => `<label class="field"><span>Name für ${p} (optional)</span><span class="name-field">${av(p, 'sm')}<input class="input" id="name-${p}" data-name="${p}" value="${esc((S.people[p] && S.people[p].name) || '')}" placeholder="${p === 'V' ? 'z. B. Vincent' : 'z. B. Mia'}" maxlength="24" autocomplete="off"></span></label>`).join('')}
+      </div>
+    </section>
+    <section class="set-card">
+      <h2>Nachrichten aufs Handy und den Laptop</h2>
+      <p>Echte Push-Nachrichten kommen über die kostenlose App ntfy, auch wenn die Website geschlossen ist. Jede Person hat einen eigenen geheimen Kanal.</p>
+      ${push}
+    </section>
+    <section class="set-card">
+      <h2>Erinnerungen</h2>
+      <div>
+        ${chk('daily', 'Tägliche Erinnerung aufs Handy', 'Jeden Nachmittag gegen 17 Uhr, nur wenn etwas ansteht')}
+        <div class="set-row"><label for="p-hw">Hausaufgaben<span class="sub">Ab wann sie unter „Bald fällig“ und in der täglichen Erinnerung stehen</span></label>
+          <select class="select" id="p-hw" data-pref="remindHw">${[[0,'Am Abgabetag'],[1,'1 Tag vorher'],[2,'2 Tage vorher'],[3,'3 Tage vorher']].map(([v, l]) => `<option value="${v}"${P.remindHw === v ? ' selected' : ''}>${l}</option>`).join('')}</select></div>
+        <div class="set-row"><label for="p-ex">Tests, Klassenarbeiten, Präsentationen</label>
+          <select class="select" id="p-ex" data-pref="remindEx">${[[1,'1 Tag vorher'],[2,'2 Tage vorher'],[3,'3 Tage vorher'],[5,'5 Tage vorher'],[7,'1 Woche vorher'],[14,'2 Wochen vorher']].map(([v, l]) => `<option value="${v}"${P.remindEx === v ? ' selected' : ''}>${l}</option>`).join('')}</select></div>
+        ${chk('sound', 'Ton bei Hilfe-Ruf, während die Website offen ist')}
+      </div>
+    </section>
+    <section class="set-card">
+      <h2>Farben</h2>
+      <p>Gilt für dieses Gerät.</p>
+      <div class="palettes">${PALETTES.map(p => `<button class="pal" data-action="palette" data-v="${p.id}" aria-pressed="${P.palette === p.id}"><i style="background:linear-gradient(100deg,${p.a},${p.b})"></i><span>${p.name}<small>${p.sub}</small></span></button>`).join('')}</div>
+      <div class="set-row"><label>Hell oder dunkel</label>${seg('theme', [['auto','Automatisch'],['light','Hell'],['dark','Dunkel']])}</div>
+    </section>
+    <section class="set-card">
+      <h2>Fächer</h2>
+      <p>Hauptfächer werden beim Sortieren bevorzugt und tragen einen Stern. Die Liste teilt ihr euch.</p>
+      <div class="subj-list">
+        ${S.subjects.map((s, n) => `<div class="subj-row">
+          <input type="color" id="sc-${esc(s.id)}" value="${col(s.color)}" data-subj="${n}" data-f="color" aria-label="Farbe für ${esc(s.name)}">
+          <input class="input" id="sn-${esc(s.id)}" value="${esc(s.name)}" data-subj="${n}" data-f="name" aria-label="Name des Fachs" maxlength="30">
+          <button class="mainbtn" data-action="subj-main" data-n="${n}" aria-pressed="${!!s.main}">${s.main ? '★ Hauptfach' : '☆ Nebenfach'}</button>
+          <button class="iconbtn del" data-action="subj-del" data-n="${n}" data-confirm="1" aria-label="${esc(s.name)} löschen">${ic('trash', 16)}</button>
+        </div>`).join('')}
+      </div>
+      <button class="btn ghost sm" data-action="subj-add" style="justify-self:start">${ic('plus', 16)} Fach hinzufügen</button>
+    </section>
+    <section class="set-card">
+      <h2>Anmeldung</h2>
+      <p>${Store.mode === 'db' ? 'Live verbunden. Änderungen erscheinen sofort beim anderen.' : 'Gerade keine Live-Verbindung.'} Zum Mitmachen braucht die andere Person nur den Link und euer Passwort.</p>
+      <button class="btn ghost sm" data-action="logout" style="justify-self:start">Auf diesem Gerät abmelden</button>
+    </section>
+  </div>`;
+}
+
+/* ---------- Rendern ---------- */
+function render(force){
+  const main = $('#main');
+  const ae = document.activeElement;
+  const typing = ae && main.contains(ae) && (ae.tagName === 'TEXTAREA' || (ae.tagName === 'INPUT' && !['checkbox','radio','color','button'].includes(ae.type)));
+  if (typing && !force){ S.deferred = true; return; }
+  S.deferred = false;
+  const focusId = ae && main.contains(ae) ? ae.id : null;
+  const v = S.view;
+  main.innerHTML = v === 'hw' ? viewHw() : v === 'ex' ? viewEx() : v === 'settings' ? viewSettings() : viewHome();
+  if (focusId){ const el = document.getElementById(focusId); if (el) el.focus({preventScroll:true}); }
+}
+const NAV = [['home','Start','home'], ['hw','Hausaufgaben','book'], ['ex','Tests','exam'], ['settings','Einstellungen','sliders']];
+function renderChrome(){
+  const rem = S.loaded ? reminders() : [];
+  const badges = {hw: rem.filter(i => i.kind === 'hw').length, ex: rem.filter(isExam).length};
+  const navHTML = (cls) => NAV.map(([v, l, icon]) => `<button class="${cls}" data-action="nav" data-view="${v}" ${S.view === v ? 'aria-current="page"' : ''}>${ic(icon, 20)}<span class="lbl">${cls === 'tabbtn' && v === 'settings' ? 'Mehr' : l}</span>${badges[v] ? `<span class="badge">${badges[v]}</span>` : ''}</button>`).join('');
+  $('#sidenav').innerHTML = navHTML('navbtn') + `<div class="side-foot">${P.me ? 'Angemeldet als ' + esc(pn(P.me)) : 'Noch nicht ausgewählt, wer du bist'}</div>`;
+  $('#tabbar').innerHTML = navHTML('tabbtn');
+  const sync = $('#sync');
+  sync.className = 'sync' + (Store.mode === 'db' ? ' live' : Store.mode === 'offline' ? ' local' : '');
+  sync.innerHTML = `<span>${Store.mode === 'db' ? 'Live' : Store.mode === 'offline' ? 'Offline' : 'Verbinde …'}</span>`;
+  sync.title = Store.mode === 'db' ? 'Live synchronisiert' : Store.mode === 'offline' ? 'Keine Live-Verbindung' : 'Verbinde';
+  $('#me-btn').innerHTML = P.me ? av(P.me) : '<span class="av none">?</span>';
+  const incoming = incomingHelp();
+  const mine = P.me && helpActive(S.signals[P.me]);
+  const hb = $('#help-btn');
+  hb.className = 'help-btn' + (incoming.length ? ' alert' : mine ? ' mine' : '');
+  hb.innerHTML = ic('phoneQ', 22) + (incoming.length ? `<span class="dot">${av(incoming[0], 'sm')}</span>` : '');
+  hb.setAttribute('aria-label', incoming.length ? `${pn(incoming[0])} braucht Hilfe` : mine ? 'Dein Hilfe-Ruf ist aktiv' : 'Hilfe rufen');
+  $('#fab').innerHTML = ic('plus', 22) + '<span>Neu</span>';
+  $('#fab').hidden = S.view === 'settings';
+  const n = rem.length + incoming.length;
+  document.title = (incoming.length ? '(!) ' : n ? `(${n}) ` : '') + APP_TITLE;
+}
+function incomingHelp(){
+  return ['V','M'].filter(p => p !== P.me && helpActive(S.signals[p]));
+}
+function renderBanner(){
+  const out = [];
+  incomingHelp().forEach(p => {
+    const s = S.signals[p];
+    const item = s.itemId && S.items.find(i => i.id === s.itemId);
+    const acked = s.ack && s.ack.by;
+    const parts = [s.reason, s.msg].filter(Boolean).map(t => `„${esc(t)}“`);
+    if (item) parts.push(esc(subj(item.subject).name + ': ' + item.title));
+    parts.push(esc(ago(s.ts)));
+    out.push(`<div class="help-banner" role="alert">
+      <span class="help-ico">${ic('phoneQ', 26)}</span>
+      <div class="hb-text"><b>${esc(pn(p))} ${s.type === 'together' ? 'möchte es zusammen machen' : 'braucht Hilfe'}</b><span>${parts.join(' · ')}</span></div>
+      <div class="hb-actions">
+        ${acked ? `<span class="btn sm onacc">${ic('check', 16)} ${esc(pn(s.ack.by))} hat reagiert</span>` : `<button class="btn sm light" data-action="ack" data-p="${p}">${s.type === 'together' ? 'Bin dabei' : 'Ich melde mich'}</button>`}
+        ${item ? `<button class="btn sm onacc" data-action="open" data-id="${esc(item.id)}">Aufgabe öffnen</button>` : ''}
+      </div>
+    </div>`);
+  });
+  if (P.me && helpActive(S.signals[P.me])){
+    const s = S.signals[P.me];
+    out.push(`<div class="help-banner mine">
+      <span class="help-ico">${ic('phoneQ', 24)}</span>
+      <div class="hb-text"><b>${s.type === 'together' ? 'Dein Vorschlag ist aktiv' : 'Dein Hilfe-Ruf ist aktiv'}</b><span>${s.ack && s.ack.by ? esc(pn(s.ack.by)) + ' meldet sich ' + esc(ago(s.ack.ts)) : esc(pn(other(P.me))) + ' sieht das Handy-Symbol · ' + esc(ago(s.ts))}</span></div>
+      <div class="hb-actions"><button class="btn sm ghost" data-action="end-help">${s.type === 'together' ? 'Beenden' : 'Hilfe-Ruf beenden'}</button></div>
+    </div>`);
+  }
+  if (Store.mode === 'offline' && Store.loaded){
+    out.push('<div class="notice">Keine Live-Verbindung. Prüfe das Internet. Die Seite verbindet sich von selbst wieder.</div>');
+  }
+  $('#banner').innerHTML = out.join('');
+}
+
+/* ---------- Modal ---------- */
+function openModal(html, onClose){
+  const root = $('#modal-root');
+  if (S.notesUnsub){ S.notesUnsub(); S.notesUnsub = null; }
+  S.openId = null;
+  root.innerHTML = `<div class="scrim" data-action="close-modal"></div><div class="sheet" role="dialog" aria-modal="true"><button class="iconbtn sheet-x" data-action="close-modal" aria-label="Schließen">${ic('x', 18)}</button>${html}</div>`;
+  root.hidden = false;
+  document.body.classList.add('modal-open');
+  S.onModalClose = onClose || null;
+}
+function closeModal(){
+  const root = $('#modal-root');
+  if (S.notesUnsub){ S.notesUnsub(); S.notesUnsub = null; }
+  S.openId = null; S.notes = []; S.pendingFiles = [];
+  root.hidden = true; root.innerHTML = '';
+  document.body.classList.remove('modal-open');
+  const cb = S.onModalClose; S.onModalClose = null;
+  if (cb) cb();
+}
+
+/* Wer bist du? */
+function askWho(then){
+  S.afterPick = then || null;
+  openModal(`<h2>Wer bist du?</h2><p class="lead">Wähle einmal aus, wer auf diesem Konto schreibt. Danach setzt du deine eigenen Häkchen und kannst Hilfe rufen.</p>
+    <div class="who-pick">${['V','M'].map(p => `<button class="who-card" data-action="pick-me" data-p="${p}">${av(p, 'lg')}<span>Ich bin ${esc(pn(p))}</span></button>`).join('')}</div>`);
+}
+
+/* Formular: Eintrag anlegen oder bearbeiten */
+function openForm(item, opts){
+  opts = opts || {};
+  const kind = item ? item.kind : (opts.kind || (S.view === 'ex' ? 'test' : 'hw'));
+  const due = item ? item.due : (opts.date || addDays(todayKey(), EXAM_KINDS.includes(kind) ? 7 : 1));
+  const subjId = item ? (item.subject || '') : (S.ui.subj || P.lastSubject || '');
+  const topics = item && item.topics ? item.topics.map(t => t.text).join('\n') : '';
+  openModal(`<h2>${item ? 'Eintrag bearbeiten' : 'Neuer Eintrag'}</h2>
+  <form class="form" id="item-form" ${item ? `data-id="${esc(item.id)}"` : ''} novalidate>
+    <fieldset class="field"><legend>Art</legend><div class="chips">
+      ${Object.keys(KINDS).map(k => `<label class="chip-r"><input type="radio" name="kind" value="${k}"${k === kind ? ' checked' : ''}><span>${KINDS[k].label}</span></label>`).join('')}
+    </div></fieldset>
+    <div class="row2">
+      <label class="field"><span>Fach</span><select class="input" name="subject" id="if-subject"><option value="">Allgemein / kein Fach</option>${S.subjects.map(s => `<option value="${esc(s.id)}"${s.id === subjId ? ' selected' : ''}>${esc(s.name)}${s.main ? ' ★' : ''}</option>`).join('')}</select></label>
+      <label class="field"><span id="if-due-label">Fällig am</span><input class="input" type="date" name="due" id="if-due" value="${esc(due)}" required></label>
+    </div>
+    <label class="field"><span id="if-title-label">Aufgabe</span><input class="input" name="title" id="if-title" value="${esc(item ? item.title : '')}" maxlength="140" autocomplete="off" required><span class="err" id="if-err" hidden></span></label>
+    <label class="field"><span>Details (optional)</span><textarea class="input" name="desc" id="if-desc" rows="3" maxlength="4000" placeholder="Was genau, wo steht es, was ist wichtig?">${esc(item ? item.desc || '' : '')}</textarea></label>
+    <label class="field" id="if-topics-wrap"><span>Themen (eins pro Zeile)</span><textarea class="input" name="topics" id="if-topics" rows="4" placeholder="Bruchrechnung&#10;Dreisatz&#10;Prozentrechnung">${esc(topics)}</textarea></label>
+    <div class="form-foot"><button type="button" class="btn ghost" data-action="${item ? 'back-detail' : 'close-modal'}" ${item ? `data-id="${esc(item.id)}"` : ''}>Abbrechen</button><button class="btn primary" type="submit">${item ? 'Speichern' : 'Eintragen'}</button></div>
+  </form>`);
+  updateFormKind($('#item-form'));
+  setTimeout(() => { const t = $('#if-title'); if (t && !item) t.focus(); }, 60);
+}
+function updateFormKind(form){
+  const k = form.querySelector('input[name=kind]:checked').value;
+  $('#if-topics-wrap').hidden = !EXAM_KINDS.includes(k);
+  $('#if-due-label').textContent = k === 'hw' ? 'Fällig am' : 'Datum';
+  $('#if-title-label').textContent = k === 'hw' ? 'Aufgabe' : k === 'event' ? 'Was ist los?' : k === 'pres' ? 'Thema der Präsentation' : 'Titel';
+  $('#if-title').placeholder = {hw:'z. B. AB S. 34, Nr. 2–5', test:'z. B. Vokabeltest Unit 3', ka:'z. B. 2. Klassenarbeit', pres:'z. B. Die Römer in Köln', event:'z. B. Wandertag, Elternsprechtag'}[k];
+}
+async function saveItem(form){
+  const fd = new FormData(form);
+  const kind = fd.get('kind');
+  const title = String(fd.get('title') || '').trim();
+  const due = String(fd.get('due') || '');
+  const err = $('#if-err');
+  if (!title || !/^\d{4}-\d{2}-\d{2}$/.test(due)){
+    err.hidden = false; err.textContent = !title ? 'Bitte gib eine Aufgabe oder einen Titel ein.' : 'Bitte wähle ein Datum.';
+    (!title ? $('#if-title') : $('#if-due')).focus();
+    return;
+  }
+  const id = form.dataset.id;
+  const old = id && S.items.find(i => i.id === id);
+  const data = {kind, subject: String(fd.get('subject') || ''), title, due, desc: String(fd.get('desc') || '').trim(), who: old ? (old.who || 'both') : 'both', updatedAt: Date.now()};
+  if (EXAM_KINDS.includes(kind)){
+    const prev = (old && old.topics) || [];
+    data.topics = String(fd.get('topics') || '').split('\n').map(t => t.trim()).filter(Boolean).slice(0, 60)
+      .map(text => { const f = prev.find(p => p.text === text); return {id: f ? f.id : Store.newId(), text}; });
+  }
+  if (data.subject) setPref('lastSubject', data.subject, {silent:true});
+  const btn = form.querySelector('[type=submit]'); btn.disabled = true;
+  try {
+    if (id){ await write(`items/${id}`, 'update', data); toast('Gespeichert'); openDetail(id); }
+    else {
+      const nid = Store.newId();
+      await write(`items/${nid}`, 'set', Object.assign(data, {topics: data.topics || [], done:{V:false, M:false}, createdBy: P.me || '', createdAt: Date.now()}));
+      closeModal(); toast(`${KINDS[kind].label} eingetragen`);
+      if (P.me) notify(other(P.me), `${pn(P.me)} hat eingetragen: ${KINDS[kind].label}`, `${subj(data.subject).name}: ${title} · ${fmtDate(due)}`, {pref:'notifyNew', priority: EXAM_KINDS.includes(kind) ? 4 : 3, tags:['memo'], itemId: nid});
+      S.selDay = due;
+    }
+  } catch(e){ btn.disabled = false; }
+}
+
+/* Detailansicht */
+function openDetail(id){
+  const item = S.items.find(i => i.id === id);
+  if (!item) return;
+  openModal(`<div id="dt-head"></div>
+    <section class="dt-sec" id="dt-topics-sec" hidden>
+      <h3>Themen</h3><ul class="topics" id="dt-topics"></ul>
+      <form class="inline-form" id="topic-form"><input class="input" id="topic-input" name="topic" placeholder="Thema hinzufügen, z. B. Satzglieder" maxlength="140" autocomplete="off"><button class="btn sm" type="submit">Hinzufügen</button></form>
+    </section>
+    <section class="dt-sec">
+      <h3>Notizen, Fotos &amp; PDFs</h3>
+      <div class="notes" id="dt-notes"><p class="empty-sm">Lade …</p></div>
+      <form class="composer" id="note-form">
+        <textarea id="note-text" name="text" rows="2" maxlength="4000" placeholder="Notiz, Lösungsweg oder Hinweis für ${esc(pn(other(P.me || 'V')))} …"></textarea>
+        <div class="pending" id="note-pending"></div>
+        <div class="composer-row">
+          <label class="btn ghost sm" id="attach-label" hidden>${ic('clip', 16)} Foto oder PDF<input type="file" id="note-file" accept="image/*,application/pdf" multiple hidden></label>
+          <span class="hint" id="attach-hint"></span>
+          <button class="btn primary sm" type="submit" id="note-send">Senden</button>
+        </div>
+      </form>
+    </section>`);
+  S.openId = id;
+  S.seen[id] = Date.now(); LS.set('vm-seen', S.seen);
+  renderDetail(); renderAttach();
+  S.notesUnsub = Store.watchCollection(`items/${id}/notes`, list => { S.notes = list.sort((a, b) => (a.ts || 0) - (b.ts || 0)); renderNotes(); });
+}
+function renderAttach(){
+  const lab = $('#attach-label'), hint = $('#attach-hint');
+  if (!lab) return;
+  lab.hidden = !S.assets;
+  hint.textContent = S.assets ? 'Bilder werden vor dem Hochladen verkleinert.' : Store.mode === 'local' ? 'Fotos und PDFs gehen nur mit Synchronisierung.' : 'Zum Hochladen von Dateien brauchst du Bearbeitungsrechte.';
+}
+function renderDetail(){
+  const i = S.items.find(x => x.id === S.openId);
+  const head = $('#dt-head');
+  if (!head) return;
+  if (!i){ closeModal(); toast('Dieser Eintrag wurde gelöscht.'); return; }
+  const s = subj(i.subject), d = i.due ? daysUntil(i.due) : null;
+  head.innerHTML = `
+    <div class="dt-top"><span class="subj" style="--c:${col(s.color)}"><i></i>${esc(s.name)}${s.main ? ' <b class="star">★</b>' : ''}</span>${kindBadge(i.kind)}${(i.who === 'V' || i.who === 'M') ? `<span class="only">nur ${esc(pn(i.who))}</span>` : ''}</div>
+    <h2 class="dt-title">${esc(i.title)}</h2>
+    <p class="dt-due">${i.kind === 'hw' ? 'Fällig' : 'Am'} ${esc(fmtLong(i.due))} ${d !== null ? duePill(i, d) : ''}</p>
+    ${i.kind === 'hw' ? `<div class="dt-done"><span>Erledigt?</span>${doneBtns(i, true)}</div>` : ''}
+    ${otherDoneFor(i) ? `<div class="nudge"><p><b>${esc(pn(otherDoneFor(i)))}</b> hat das schon gemacht. Frag nach Hilfe oder schlag vor, es zusammen zu machen.</p><div class="dt-actions" style="margin-top:0"><button class="btn primary sm" data-action="ask" data-type="help" data-id="${esc(i.id)}">${ic('phoneQ', 16)} Um Hilfe fragen</button><button class="btn sm" data-action="ask" data-type="together" data-id="${esc(i.id)}">Zusammen machen</button></div></div>` : ''}
+    ${i.desc ? `<p class="dt-desc">${esc(i.desc)}</p>` : ''}
+    <div class="dt-actions">
+      <button class="btn ghost sm" data-action="edit" data-id="${esc(i.id)}">${ic('edit', 16)} Bearbeiten</button>
+      <button class="btn ghost sm" data-action="help" data-id="${esc(i.id)}">${ic('phoneQ', 16)} Hilfe dazu rufen</button>
+      <button class="btn ghost sm danger" data-action="del-item" data-id="${esc(i.id)}" data-confirm="1">${ic('trash', 16)} <span>Löschen</span></button>
+    </div>
+    <p class="dt-by">${i.createdBy ? 'Eingetragen von ' + esc(pn(i.createdBy)) + ' · ' : ''}${esc(ago(i.createdAt))}</p>`;
+  const sec = $('#dt-topics-sec');
+  sec.hidden = !isExam(i);
+  if (isExam(i)){
+    const t = i.topics || [];
+    $('#dt-topics').innerHTML = t.length ? t.map(x => `<li><span>${esc(x.text)}</span><button class="iconbtn" data-action="del-topic" data-tid="${esc(x.id)}" aria-label="Thema entfernen">${ic('x', 16)}</button></li>`).join('') : '<li><span class="empty-sm">Noch keine Themen. Was kommt dran?</span></li>';
+  }
+}
+function renderNotes(){
+  const box = $('#dt-notes');
+  if (!box) return;
+  if (!S.notes.length){ box.innerHTML = '<p class="empty-sm">Noch nichts hier. Schreib eine Notiz oder häng ein Foto vom Arbeitsblatt an.</p>'; return; }
+  Files.ensure([].concat.apply([], S.notes.map(n => (n.files || []).map(f => f.id)))).then(ch => { if (ch) renderNotes(); }).catch(() => {});
+  box.innerHTML = S.notes.map(n => {
+    const files = (n.files || []).map(f => {
+      const url = Files.url(f.id);
+      if (!url) return `<span class="filechip">${ic('file', 16)}<span>${esc(f.name || 'Datei')} lädt …</span></span>`;
+      if (/^image\//.test(f.type || '')) return `<button class="thumb" data-action="lightbox" data-src="${esc(url)}" aria-label="Bild ${esc(f.name)} ansehen"><img src="${esc(url)}" alt="${esc(f.name)}" loading="lazy"></button>`;
+      return `<a class="filechip" href="${esc(url)}" target="_blank" rel="noopener">${ic('file', 16)}<span>${esc(f.name || 'Datei')}</span></a>`;
+    }).join('');
+    const mine = n.by && n.by === P.me;
+    return `<div class="note${mine ? ' mine' : ''}">${n.by ? av(n.by, 'sm') : ''}<div class="note-body">
+      <div class="note-meta"><b>${esc(pn(n.by) || '?')}</b><span>${esc(ago(n.ts))}</span>${mine ? `<button class="iconbtn" data-action="del-note" data-nid="${esc(n.id)}" data-confirm="1" aria-label="Notiz löschen" title="Löschen">${ic('trash', 14)}</button>` : ''}</div>
+      ${n.text ? `<p class="note-text">${esc(n.text)}</p>` : ''}
+      ${files ? `<div class="note-files">${files}</div>` : ''}
+    </div></div>`;
+  }).join('');
+}
+function renderPending(){
+  const box = $('#note-pending');
+  if (!box) return;
+  box.innerHTML = S.pendingFiles.map((f, n) => `<span class="pchip">${ic(/^image\//.test(f.type) ? 'clip' : 'file', 14)}<span>${esc(f.name)}</span><button type="button" data-action="unpend" data-n="${n}" aria-label="Entfernen">${ic('x', 12)}</button></span>`).join('');
+}
+async function prepareFile(f){
+  let type = f.type || '';
+  if (!type && /\.pdf$/i.test(f.name)) type = 'application/pdf';
+  const needsConvert = /^image\/(heic|heif)$/i.test(type) || (/^image\/(jpeg|png|webp)$/.test(type) && f.size > 1.5 * 1048576);
+  if (needsConvert && window.createImageBitmap){
+    try {
+      const bmp = await createImageBitmap(f);
+      const scale = Math.min(1, 2200 / Math.max(bmp.width, bmp.height));
+      const c = document.createElement('canvas');
+      c.width = Math.round(bmp.width * scale); c.height = Math.round(bmp.height * scale);
+      c.getContext('2d').drawImage(bmp, 0, 0, c.width, c.height);
+      const blob = await new Promise(r => c.toBlob(r, 'image/jpeg', .86));
+      if (blob) return {blob, type:'image/jpeg'};
+    } catch(e){}
+  }
+  return {blob: f, type};
+}
+function uploadErr(e, name){
+  const c = e && e.code;
+  if (c === 'too_large') return `${name} ist zu groß (höchstens 20 MB).`;
+  if (c === 'unsupported_type') return `${name}: Dieses Dateiformat geht nicht. Nimm JPG, PNG oder PDF.`;
+  if (c === 'quota_or_state') return 'Der Speicher für Dateien ist voll. Lösche alte Notizen mit Anhängen.';
+  if (c === 'rate_limited') return 'Zu viele Uploads auf einmal. Warte kurz und versuch es nochmal.';
+  if (c === 'not_granted' || c === 'capability_disabled') return 'Hochladen ist hier nicht erlaubt. Du brauchst Bearbeitungsrechte.';
+  return `${name} konnte nicht hochgeladen werden.`;
+}
+async function sendNote(){
+  const id = S.openId; if (!id) return;
+  if (!P.me) return askWho(() => openDetail(id));
+  const ta = $('#note-text'), btn = $('#note-send');
+  const text = ta.value.trim();
+  const files = S.pendingFiles.slice();
+  if (!text && !files.length){ ta.focus(); return; }
+  btn.disabled = true; btn.textContent = files.length ? 'Lädt hoch …' : 'Sendet …';
+  const up = [];
+  for (const f of files){
+    try {
+      const {blob, type} = await prepareFile(f);
+      let r;
+      try { r = await S.assets.upload(blob, type ? {type} : undefined); }
+      catch(e){ if (e && e.code === 'store_unavailable'){ await sleep(800); r = await S.assets.upload(blob, type ? {type} : undefined); } else throw e; }
+      up.push({id: r.id, name: f.name.slice(0, 120), type: r.contentType, size: r.sizeBytes});
+    } catch(e){ toast(uploadErr(e, f.name), 'err'); }
+  }
+  if (!text && !up.length){ btn.disabled = false; btn.textContent = 'Senden'; return; }
+  try {
+    const ts = Date.now();
+    await write(`items/${id}/notes/${Store.newId()}`, 'set', {by: P.me, text, ts, files: up});
+    write(`items/${id}`, 'update', {hasNotes: true, lastNoteAt: ts, lastNoteBy: P.me}).catch(() => {});
+    const it = S.items.find(x => x.id === id);
+    notify(other(P.me), `${pn(P.me)} zu „${it ? it.title : 'Eintrag'}“`, text || (up.length === 1 ? '1 Datei angehängt' : up.length + ' Dateien angehängt'), {pref:'notifyNotes', tags:['paperclip'], itemId: id});
+    S.seen[id] = ts + 1; LS.set('vm-seen', S.seen);
+    if ($('#note-text')){ $('#note-text').value = ''; S.pendingFiles = []; renderPending(); }
+  } catch(e){}
+  const b = $('#note-send'); if (b){ b.disabled = false; b.textContent = 'Senden'; }
+}
+async function deleteNote(nid){
+  const n = S.notes.find(x => x.id === nid); const id = S.openId;
+  if (!n || !id) return;
+  try {
+    await write(`items/${id}/notes/${nid}`, 'delete');
+    if (S.assets) for (const f of (n.files || [])) await S.assets.delete(f.id).catch(() => {});
+  } catch(e){}
+}
+async function deleteItem(id){
+  closeModal();
+  try {
+    const notes = await Store.getCollection(`items/${id}/notes`);
+    for (const n of notes){
+      await write(`items/${id}/notes/${n.id}`, 'delete');
+      if (S.assets) for (const f of (n.files || [])) await S.assets.delete(f.id).catch(() => {});
+    }
+    await write(`items/${id}`, 'delete');
+    toast('Gelöscht');
+  } catch(e){}
+}
+
+/* Hilfe-Ruf */
+function openHelp(itemId){
+  if (!P.me) return askWho(() => openHelp(itemId));
+  const mine = S.signals[P.me];
+  const o = pn(other(P.me));
+  if (helpActive(mine)){
+    openModal(`<h2>Dein Hilfe-Ruf ist aktiv</h2><p class="lead">${mine.ack && mine.ack.by ? esc(pn(mine.ack.by)) + ' hat ' + esc(ago(mine.ack.ts)) + ' reagiert.' : esc(o) + ' sieht seit ' + esc(ago(mine.ts).replace('vor ', '')) + ' das Handy-Symbol mit Fragezeichen.'}</p>
+      <div class="form-foot" style="margin-top:20px"><button class="btn ghost" data-action="close-modal">Aktiv lassen</button><button class="btn primary" data-action="end-help">Hilfe-Ruf beenden</button></div>`);
+    return;
+  }
+  const item = itemId && S.items.find(i => i.id === itemId);
+  openModal(`<h2>Hilfe rufen</h2><p class="lead">${esc(o)} bekommt sofort eine Nachricht aufs Handy und sieht hier ein Handy-Symbol mit Fragezeichen.</p>
+    <form class="form" id="help-form" ${item ? `data-item="${esc(item.id)}"` : ''}>
+      <fieldset class="field"><legend>Worum geht's?</legend><div class="reasons">
+        ${HELP_REASONS.map((r, n) => `<label class="chip-r"><input type="radio" name="reason" value="${esc(r)}"${n === 0 ? ' checked' : ''}><span>${esc(r)}</span></label>`).join('')}
+      </div></fieldset>
+      ${item ? `<p class="notice" style="margin:0">Zu: <b>${esc(subj(item.subject).name)}</b> · ${esc(item.title)}</p>` : ''}
+      <label class="field"><span>Nachricht (optional)</span><input class="input" name="msg" id="help-msg" maxlength="200" placeholder="z. B. Aufgabe 3b, ab 18 Uhr erreichbar" autocomplete="off"></label>
+      <div class="form-foot"><button type="button" class="btn ghost" data-action="close-modal">Abbrechen</button><button class="btn primary" type="submit">${ic('phoneQ', 18)} Hilfe rufen</button></div>
+    </form>`);
+}
+async function sendHelp(form){
+  const fd = new FormData(form);
+  try {
+    await write(`signals/${P.me}`, 'set', {active:true, ts: Date.now(), type:'help', reason: String(fd.get('reason') || ''), msg: String(fd.get('msg') || '').trim(), itemId: form.dataset.item || null, ack: null});
+    closeModal(); toast(`${pn(other(P.me))} bekommt eine Nachricht`);
+    helpPush('help', String(fd.get('reason') || ''), String(fd.get('msg') || '').trim(), form.dataset.item || null);
+  } catch(e){}
+}
+function openNudge(id){
+  const i = S.items.find(x => x.id === id); const o = otherDoneFor(i);
+  if (!i || !o) return;
+  openModal(`<h2>${esc(pn(o))} ist schon fertig</h2><p class="lead">${esc(subj(i.subject).name)}: ${esc(i.title)}</p>
+    <div class="form">
+      <label class="field"><span>Nachricht (optional)</span><input class="input" id="ask-msg" maxlength="200" placeholder="z. B. Nr. 3 verstehe ich nicht / Heute 17 Uhr per Video?" autocomplete="off"></label>
+      <div class="form-foot"><button class="btn" data-action="ask" data-type="together" data-id="${esc(i.id)}">Zusammen machen vorschlagen</button><button class="btn primary" data-action="ask" data-type="help" data-id="${esc(i.id)}">${ic('phoneQ', 18)} Um Hilfe fragen</button></div>
+    </div>`);
+}
+async function sendAsk(type, itemId){
+  if (!P.me) return askWho();
+  const m = $('#ask-msg');
+  const msg = m ? m.value.trim().slice(0, 200) : '';
+  const reason = type === 'together' ? 'Wollen wir das zusammen machen?' : 'Kannst du mir dabei helfen?';
+  try {
+    await write(`signals/${P.me}`, 'set', {active:true, ts: Date.now(), type, reason, msg, itemId: itemId || null, ack: null});
+    if (!S.openId) closeModal();
+    toast(`${pn(other(P.me))} bekommt ${type === 'together' ? 'deinen Vorschlag' : 'deine Frage'}`);
+    helpPush(type, reason, msg, itemId);
+  } catch(e){}
+}
+function endHelp(){
+  if (!P.me) return;
+  write(`signals/${P.me}`, 'set', {active:false, ts: Date.now(), reason:'', msg:'', itemId:null, ack:null}).then(() => { if (!$('#modal-root').hidden && !$('#item-form') && !S.openId) closeModal(); toast('Hilfe-Ruf beendet'); }).catch(() => {});
+}
+function ackHelp(p){
+  if (!P.me) return askWho(() => ackHelp(p));
+  write(`signals/${p}`, 'update', {ack:{by: P.me, ts: Date.now()}}).then(() => { toast(`${pn(p)} sieht, dass du dich meldest`); notify(p, `${pn(P.me)} meldet sich`, (S.signals[p] && S.signals[p].type === 'together') ? 'Ihr macht es zusammen.' : 'Hilfe ist unterwegs.', {priority: 4, tags: ['telephone_receiver']}); }).catch(() => {});
+}
+
+/* ---------- Datenfluss ---------- */
+function onSignals(){
+  const inc = incomingHelp();
+  inc.forEach(p => {
+    const s = S.signals[p];
+    if (s.ts > S.helpSeen){
+      S.helpSeen = s.ts; LS.set('vm-help-seen', s.ts);
+      if (P.sound) chime();
+      const what = s.type === 'together' ? 'möchte es zusammen machen' : 'braucht Hilfe';
+      toast(`${pn(p)} ${what}${s.reason ? ': ' + s.reason : ''}`, 'help');
+    }
+  });
+  const mine = P.me && S.signals[P.me];
+  if (mine && helpActive(mine) && mine.ack && mine.ack.ts > S.ackSeen){
+    S.ackSeen = mine.ack.ts; LS.set('vm-ack-seen', S.ackSeen);
+    toast(`${pn(mine.ack.by)} meldet sich gleich`, 'help');
+  }
+  renderBanner(); renderChrome();
+}
+function runReminders(){
+  if (!S.loaded || !S.prefsReady || !P.me) return;
+  const tk = todayKey();
+  const fresh = reminders().filter(i => !SS.has(`rem:${i.id}:${tk}`));
+  fresh.slice(0, 3).forEach((i, n) => {
+    SS.add(`rem:${i.id}:${tk}`);
+    const d = daysUntil(i.due);
+    const when = d < 0 ? 'ist überfällig' : d === 0 ? 'ist heute dran' : d === 1 ? 'ist morgen dran' : `ist in ${d} Tagen dran`;
+    setTimeout(() => toast(`${i.kind === 'hw' ? 'Hausaufgabe' : KINDS[i.kind].label} ${subj(i.subject).name}: ${i.title} ${when}`), 300 + n * 500);
+  });
+  if (fresh.length > 3){ fresh.slice(3).forEach(i => SS.add(`rem:${i.id}:${tk}`)); setTimeout(() => toast(`… und ${fresh.length - 3} weitere. Schau unter „Bald fällig“.`), 2000); }
+}
+function onData(){
+  render(); renderChrome(); renderBanner();
+  openFromHash();
+  if (S.openId) renderDetail();
+  runReminders();
+}
+function subscribe(){
+  Store.watchCollection('items', list => { S.items = list; S.loaded = true; onData(); }, () => toast('Die Verbindung ist abgebrochen. Lade die Seite neu.', 'err'));
+  Store.watchCollection('prefs', list => { const m = {}; list.forEach(d => m[d.id] = d); S.rprefs = m; applyRemotePrefs(); });
+  Store.watchCollection('signals', list => { const m = {}; list.forEach(s => m[s.id] = s); S.signals = m; onSignals(); }, () => {});
+  Store.watchCollection('config', list => {
+    list.forEach(d => {
+      if (d.id === 'subjects' && Array.isArray(d.list) && d.list.length) S.subjects = d.list.filter(s => s && s.id);
+      if (d.id === 'notify' && d.prefix) S.notifyPrefix = String(d.prefix);
+      if (d.id === 'people') S.people = {V: d.V || {name:''}, M: d.M || {name:''}};
+    });
+    render(); renderChrome(); renderBanner();
+    if (S.openId) renderDetail();
+  }, () => {});
+}
+function saveSubjects(){ write('config/subjects', 'set', {list: S.subjects}).catch(() => {}); }
+
+function lockScreen(html){
+  document.body.classList.add('locked');
+  $('#banner').innerHTML = '';
+  $('#main').innerHTML = html;
+}
+function viewLogin(err){
+  return `<section class="login"><div class="login-duo">${av('V', 'lg')}${av('M', 'lg')}</div><h1>Hausaufgaben</h1>
+    <p class="lead">Gib euer gemeinsames Passwort ein. Danach bleibst du auf diesem Gerät angemeldet.</p>
+    <form id="login-form" class="form"><label class="field"><span>Passwort</span><input class="input" type="password" id="login-pw" name="pw" autocomplete="current-password" required></label>${err ? `<p class="err">${esc(err)}</p>` : ''}<button class="btn primary" type="submit">Anmelden</button></form></section>`;
+}
+async function doLogin(form){
+  const pw = $('#login-pw').value;
+  const btn = form.querySelector('[type=submit]');
+  btn.disabled = true; btn.textContent = 'Melde an …';
+  let error = null;
+  try { ({error} = await S.sb.auth.signInWithPassword({email: CFG.loginEmail, password: pw})); } catch(e){ error = e; }
+  if (error){
+    lockScreen(viewLogin(/invalid|credentials/i.test(String(error.message)) ? 'Das Passwort stimmt nicht.' : 'Anmelden ging nicht. Prüfe die Internetverbindung.'));
+    setTimeout(() => { const i = $('#login-pw'); if (i) i.focus(); }, 30);
+    return;
+  }
+  start();
+}
+function openFromHash(){
+  const m = /item=([A-Za-z0-9_-]+)/.exec(location.hash || '');
+  if (!m || !S.loaded) return;
+  history.replaceState(null, '', location.pathname + location.search);
+  if (S.items.find(i => i.id === m[1])) openDetail(m[1]);
+}
+async function start(){
+  document.body.classList.remove('locked');
+  S.assets = Files;
+  render(true); renderChrome();
+  subscribe();
+  try { await Store.loadAll(); }
+  catch(e){ toast('Daten konnten nicht geladen werden. Prüfe die Verbindung und lade die Seite neu.', 'err'); return; }
+  Store.connect();
+  if (!Store.cache.has('config/notify')){
+    const a = new Uint8Array(16); crypto.getRandomValues(a);
+    write('config/notify', 'set', {prefix: 'hausaufgaben-' + Array.from(a, b => (b % 36).toString(36)).join('')}).catch(() => {});
+  }
+  S.prefsReady = true;
+  if (!P.me) askWho(); else applyRemotePrefs();
+  render(true); renderChrome(); runReminders();
+}
+async function init(){
+  $('#lb-open').innerHTML = ic('ext', 18); $('#lightbox [data-action=lb-close]').innerHTML = ic('x', 18);
+  const ok = window.supabase && /^https:\/\/.+/.test(CFG.supabaseUrl || '') && !/DEIN/.test(String(CFG.supabaseUrl) + String(CFG.supabaseAnonKey)) && CFG.loginEmail;
+  if (!ok){
+    lockScreen(`<section class="login"><h1>Fast fertig</h1><p class="lead">${window.supabase ? 'Die Datei <b>config.js</b> ist noch nicht ausgefüllt. Trag dort die Supabase-Adresse und den Schlüssel ein, wie in der Anleitung beschrieben.' : 'Die Supabase-Bibliothek konnte nicht geladen werden. Prüfe die Internetverbindung und lade die Seite neu.'}</p></section>`);
+    return;
+  }
+  S.sb = window.supabase.createClient(CFG.supabaseUrl, CFG.supabaseAnonKey, {auth: {persistSession: true, autoRefreshToken: true}});
+  S.sb.auth.onAuthStateChange(ev => { if (ev === 'SIGNED_OUT') location.reload(); });
+  let session = null;
+  try { const r = await S.sb.auth.getSession(); session = r.data && r.data.session; } catch(e){}
+  if (session) start(); else lockScreen(viewLogin());
+  if ('serviceWorker' in navigator && location.protocol === 'https:') navigator.serviceWorker.register('sw.js').catch(() => {});
+}
+window.addEventListener('hashchange', openFromHash);
+document.addEventListener('visibilitychange', () => {
+  if (document.visibilityState === 'visible' && Store.loaded) Store.loadAll().catch(() => {});
+});
+
+/* ---------- Ereignisse ---------- */
+const ACTIONS = {
+  nav(el){ S.view = el.dataset.view; LS.set('vm-view', S.view); render(true); renderChrome(); window.scrollTo(0, 0); },
+  seg(el){ setPref(el.dataset.k, el.dataset.v); },
+  month(el){
+    const d = +el.dataset.d;
+    if (d === 0){ const n = new Date(); S.month = new Date(n.getFullYear(), n.getMonth(), 1); S.selDay = todayKey(); }
+    else { S.month = new Date(S.month.getFullYear(), S.month.getMonth() + d, 1); S.selDay = monthKey(S.month) === todayKey().slice(0, 7) ? todayKey() : keyOf(S.month); }
+    render(true);
+  },
+  day(el){
+    S.selDay = el.dataset.day;
+    const dt = parseKey(S.selDay);
+    if (dt.getMonth() !== S.month.getMonth()) S.month = new Date(dt.getFullYear(), dt.getMonth(), 1);
+    render(true);
+    if (window.innerWidth < 1120){ const p = $('.daypanel'); if (p) p.scrollIntoView({behavior:'smooth', block:'nearest'}); }
+  },
+  add(el){ if (!P.me) return askWho(() => openForm(null, {date: el.dataset.date, kind: el.dataset.kind})); openForm(null, {date: el.dataset.date, kind: el.dataset.kind}); },
+  open(el){ openDetail(el.dataset.id); },
+  edit(el){ const i = S.items.find(x => x.id === el.dataset.id); if (i) openForm(i); },
+  'back-detail'(el){ openDetail(el.dataset.id); },
+  'close-modal'(){ closeModal(); },
+  'toggle-done'(el){
+    if (!P.me) return askWho();
+    const p = el.dataset.p; if (p !== P.me) return;
+    const i = S.items.find(x => x.id === el.dataset.id); if (!i) return;
+    const v = !(i.done && i.done[p]);
+    write(`items/${i.id}`, 'update', {done:{[p]: v}}).catch(() => {});
+    if (v){
+      toast('Erledigt. Stark!');
+      if (!(i.done || {})[other(p)]) notify(other(p), `${pn(p)} ist fertig`, `${subj(i.subject).name}: ${i.title}. Brauchst du Hilfe oder wollt ihr es zusammen machen? Tippe hier.`, {pref:'notifyDone', priority: 2, tags:['white_check_mark'], itemId: i.id});
+    }
+  },
+  'del-item'(el){ deleteItem(el.dataset.id); },
+  'del-note'(el){ deleteNote(el.dataset.nid); },
+  'del-topic'(el){
+    const i = S.items.find(x => x.id === S.openId); if (!i) return;
+    write(`items/${i.id}`, 'update', {topics: (i.topics || []).filter(t => t.id !== el.dataset.tid)}).catch(() => {});
+  },
+  unpend(el){ S.pendingFiles.splice(+el.dataset.n, 1); renderPending(); },
+  lightbox(el){ const lb = $('#lightbox'); $('#lb-img').src = el.dataset.src; $('#lb-open').href = el.dataset.src; lb.hidden = false; },
+  'lb-close'(){ $('#lightbox').hidden = true; $('#lb-img').removeAttribute('src'); },
+  help(el){ openHelp(el.dataset.id); },
+  nudge(el){ openNudge(el.dataset.id); },
+  ask(el){ sendAsk(el.dataset.type, el.dataset.id); },
+  'end-help'(){ endHelp(); },
+  ack(el){ ackHelp(el.dataset.p); },
+  'pick-me'(el){
+    setPref('me', el.dataset.p);
+    if (!$('#modal-root').hidden && $('.who-pick', $('#modal-root'))){ const cb = S.afterPick; S.afterPick = null; closeModal(); toast(`Hallo ${pn(el.dataset.p)}!`); if (cb) cb(); }
+    onSignals();
+  },
+  palette(el){ setPref('palette', el.dataset.v); },
+  'main-only'(){ S.ui.mainOnly = !S.ui.mainOnly; render(true); },
+  'subj-main'(el){ const n = +el.dataset.n; S.subjects = S.subjects.map((s, k) => k === n ? Object.assign({}, s, {main: !s.main}) : s); saveSubjects(); render(true); },
+  'subj-del'(el){ const n = +el.dataset.n; S.subjects = S.subjects.filter((s, k) => k !== n); saveSubjects(); render(true); },
+  'subj-add'(){
+    const colors = ['#E4572E','#2364AA','#4C9F38','#8D6A9F','#17A398','#F4A259','#BC4749','#5E60CE'];
+    const s = {id: 's' + Store.newId(), name: 'Neues Fach', color: colors[S.subjects.length % colors.length], main:false};
+    S.subjects = S.subjects.concat([s]); saveSubjects(); render(true);
+    const inp = document.getElementById('sn-' + s.id); if (inp){ inp.focus(); inp.select(); }
+  },
+  'copy-topic'(){
+    const t = topicFor(P.me);
+    const done = () => toast('Kanalname kopiert');
+    try { navigator.clipboard.writeText(t).then(done, () => toast('Kopieren ging nicht. Markiere den Namen und kopiere ihn selbst.', 'err')); }
+    catch(e){ toast('Kopieren ging nicht. Markiere den Namen und kopiere ihn selbst.', 'err'); }
+  },
+  'test-notify'(el){
+    el.disabled = true;
+    notify(P.me, 'Test von Hausaufgaben V&M', 'Wenn du das siehst, klappen die Benachrichtigungen.', {priority: 4, tags: ['tada']})
+      .then(ok => { el.disabled = false; toast(ok ? 'Gesendet. Ist die Nachricht auf deinem Handy angekommen?' : 'Senden ging nicht. Prüfe die Internetverbindung.', ok ? '' : 'err'); });
+  },
+  logout(){ S.sb.auth.signOut().catch(() => location.reload()); }
+};
+document.addEventListener('click', e => {
+  const el = e.target.closest('[data-action]');
+  if (!el || el.disabled) return;
+  const a = el.dataset.action;
+  if (el.dataset.confirm && !el.dataset.armed){
+    e.preventDefault();
+    el.dataset.armed = '1';
+    const span = el.querySelector('span');
+    const old = span ? span.textContent : null;
+    if (span) span.textContent = 'Wirklich löschen?';
+    el.title = 'Nochmal tippen zum Löschen';
+    setTimeout(() => { if (el.isConnected){ delete el.dataset.armed; if (span) span.textContent = old; } }, 3500);
+    return;
+  }
+  if (ACTIONS[a]){ if (el.tagName === 'A') return; e.preventDefault(); ACTIONS[a](el, e); }
+});
+document.addEventListener('keydown', e => {
+  if (e.key === 'Escape'){
+    if (!$('#lightbox').hidden) ACTIONS['lb-close']();
+    else if (!$('#modal-root').hidden) closeModal();
+  }
+  if ((e.key === 'Enter' || e.key === ' ') && e.target.classList && e.target.classList.contains('card')){ e.preventDefault(); openDetail(e.target.dataset.id); }
+});
+document.addEventListener('submit', e => {
+  const f = e.target;
+  e.preventDefault();
+  if (f.id === 'item-form') saveItem(f);
+  else if (f.id === 'note-form') sendNote();
+  else if (f.id === 'login-form') doLogin(f);
+  else if (f.id === 'help-form') sendHelp(f);
+  else if (f.id === 'topic-form'){
+    const inp = $('#topic-input'); const text = inp.value.trim();
+    const i = S.items.find(x => x.id === S.openId);
+    if (!text || !i) return;
+    inp.value = '';
+    write(`items/${i.id}`, 'update', {topics: (i.topics || []).concat([{id: Store.newId(), text: text.slice(0, 140)}])}).catch(() => {});
+  }
+});
+document.addEventListener('change', e => {
+  const t = e.target;
+  if (t.name === 'kind' && t.form && t.form.id === 'item-form') updateFormKind(t.form);
+  else if (t.id === 'note-file'){
+    const add = Array.from(t.files || []).slice(0, 10);
+    S.pendingFiles = S.pendingFiles.concat(add).slice(0, 10);
+    t.value = ''; renderPending();
+  }
+  else if (t.id === 'f-subj'){ S.ui.subj = t.value; render(true); }
+  else if (t.dataset.pref){ const v = t.type === 'checkbox' ? t.checked : (isNaN(+t.value) ? t.value : +t.value); setPref(t.dataset.pref, v); }
+  else if (t.dataset.subj !== undefined){
+    const n = +t.dataset.subj, f = t.dataset.f;
+    let v = t.value; if (f === 'name'){ v = v.trim().slice(0, 30); if (!v) return render(true); }
+    S.subjects = S.subjects.map((s, k) => k === n ? Object.assign({}, s, {[f]: v}) : s);
+    saveSubjects();
+  }
+  else if (t.dataset.name){
+    const p = t.dataset.name;
+    const people = {V: Object.assign({}, S.people.V), M: Object.assign({}, S.people.M)};
+    people[p].name = t.value.trim().slice(0, 24);
+    S.people = people;
+    write('config/people', 'set', people).catch(() => {});
+    renderChrome(); renderBanner();
+  }
+});
+document.addEventListener('focusout', e => {
+  if (S.deferred && $('#main').contains(e.target)) setTimeout(() => { if (S.deferred) render(); }, 0);
+});
+setInterval(() => {
+  if (todayKey() !== S.today){ S.today = todayKey(); render(); renderChrome(); runReminders(); }
+  renderBanner();
+}, 60000);
+
+init();
+})();
+</script>
+</body>
+</html>
